@@ -1,1 +1,4 @@
 glob:*.pyc
+glob:dist/
+glob:build/
+glob:metaTED.egg-info/
