@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metalink version="3.0" xmlns="http://www.metalinker.org/"
-          origin="http://metalinks.petarmaric.com/TED/{{ metalink_file_name }}"
+          origin="http://metated.petarmaric.com/metalinks/{{ metalink_file_name }}"
           type="dynamic" generator="metaTED {{ metaTED_version }}"
           pubdate="{{ first_published_on }}" refreshdate="{{ refresh_date }}">
     <publisher>
