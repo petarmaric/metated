@@ -33,9 +33,11 @@ def _get_metalink_file_name(quality, group_by):
 def _get_group_downloads_by(downloadable_talks):
     # Also generate metalinks with no grouped downloads
     groups = [None]
-    
+    # Extract talk_info metadata
+    metadata = downloadable_talks[0].keys()
     # Guess possible groupings from talk_info metadata
-    groups.extend(downloadable_talks[0].keys())
+    groups.extend(metadata)
+    # Can't group by qualities metadata
     groups.remove('qualities')
     
     logging.debug("Downloads can be grouped by '%s'", groups)
