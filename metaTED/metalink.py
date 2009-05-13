@@ -6,9 +6,9 @@ from metaTED.cache import cached_storage
 from metaTED.crawler.get_talk_info import AVAILABLE_VIDEO_QUALITIES
 
 
-def _get_downloads(talk_infos, quality, group_by=None):
+def _get_downloads(downloadable_talks, quality, group_by=None):
     downloads = []
-    for talk_info in talk_infos:
+    for talk_info in downloadable_talks:
         quality_info = talk_info['qualities'][quality]
         
         # Calculate full file path
@@ -30,19 +30,19 @@ def _get_metalink_file_name(quality, group_by):
     return "TED-talks%s-in-%s-quality.metalink" % (group_part, quality)
 
 
-def _get_group_downloads_by(talk_infos):
+def _get_group_downloads_by(downloadable_talks):
     # Also generate metalinks with no grouped downloads
     groups = [None]
     
     # Guess possible groupings from talk_info metadata
-    groups.extend(talk_infos[0].keys())
+    groups.extend(downloadable_talks[0].keys())
     groups.remove('qualities')
     
     logging.debug("Downloads can be grouped by '%s'", groups)
     return groups
 
 
-def generate_metalinks(talk_infos):
+def generate_metalinks(downloadable_talks):
     refresh_date = formatdate()
     first_published_on = cached_storage.get('first_published_on')
     if first_published_on is None:
@@ -51,7 +51,7 @@ def generate_metalinks(talk_infos):
     env = Environment(loader=PackageLoader('metaTED'))
     template = env.get_template('template.metalink')
 
-    for group_by in _get_group_downloads_by(talk_infos):
+    for group_by in _get_group_downloads_by(downloadable_talks):
         for quality in AVAILABLE_VIDEO_QUALITIES.keys():
             metalink_file_name = _get_metalink_file_name(quality, group_by)
             logging.debug("Generating '%s' metalink...", metalink_file_name)
@@ -62,6 +62,6 @@ def generate_metalinks(talk_infos):
                 'refresh_date': refresh_date,
                 'quality': quality,
                 'group_by': group_by,
-                'talks': _get_downloads(talk_infos, quality, group_by)
+                'talks': _get_downloads(downloadable_talks, quality, group_by)
             }).dump(metalink_file_name, encoding='utf-8')
             logging.info("Generated '%s' metalink", metalink_file_name)
