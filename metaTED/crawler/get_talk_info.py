@@ -21,8 +21,8 @@ AVAILABLE_VIDEO_QUALITIES = {
 
 _HTML_ENTITY_RE = re.compile(r'&(#?[xX]?[0-9a-fA-F]+|\w{1,8});')
 _INVALID_FILE_NAME_CHARS_RE = re.compile('[^\w\.\- ]+')
-_FILMING_YEAR_RE = re.compile('so\.addVariable\(\"fd\",\"\w+ (\d+)\"\);')
-_PUBLISHING_YEAR_RE = re.compile('so\.addVariable\(\"pd\",\"\w+ (\d+)\"\);')
+_FILMING_YEAR_RE = re.compile('fd:\"\w+ (\d+)\",')
+_PUBLISHING_YEAR_RE = re.compile('pd:\"\w+ (\d+)\",')
 
 
 class NoDownloadsFound(Exception):
@@ -37,7 +37,7 @@ def _guess_year(talk_url, soup):
     Returns year as string, or 'Unknown' if no date was found.
     """
     year_txt = soup.find(
-        id='videoPlayerSwf'
+        id='videoPlayerSWF'
     ).findNextSibling('script').string
     match = _FILMING_YEAR_RE.search(year_txt)
     if match is None:
