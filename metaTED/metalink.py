@@ -3,6 +3,7 @@ from email.utils import formatdate
 from jinja2 import Environment, PackageLoader
 from metaTED import __version__
 from metaTED.cache import cached_storage
+from metaTED.crawler.get_downloadable_talks import get_downloadable_talks
 from metaTED.crawler.get_talk_info import AVAILABLE_VIDEO_QUALITIES
 
 
@@ -44,15 +45,23 @@ def _get_group_downloads_by(downloadable_talks):
     return groups
 
 
-def generate_metalinks(downloadable_talks):
+def generate_metalinks():
+    # Above everything else, make sure downloadable_talks can be calculated
+    downloadable_talks = get_downloadable_talks()
+    
+    # Prepare the template upfront, because it can be reused between metalinks
+    env = Environment(loader=PackageLoader('metaTED'))
+    template = env.get_template('template.metalink')
+
+    # Use the same dates/times for all metalinks because they should, in my
+    # opinion, point out when the metalinks were being generated and not when
+    # they were physically written do disk
     refresh_date = formatdate()
     first_published_on = cached_storage.get('first_published_on')
     if first_published_on is None:
         cached_storage['first_published_on'] = first_published_on = refresh_date
     
-    env = Environment(loader=PackageLoader('metaTED'))
-    template = env.get_template('template.metalink')
-
+    # Generate all metalink variants
     for group_by in _get_group_downloads_by(downloadable_talks):
         for quality in AVAILABLE_VIDEO_QUALITIES.keys():
             metalink_file_name = _get_metalink_file_name(quality, group_by)

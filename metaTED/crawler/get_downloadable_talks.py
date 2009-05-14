@@ -1,11 +1,13 @@
 import logging
 from metaTED.crawler.get_talk_info import get_talk_info, NoDownloadsFound
+from metaTED.crawler.get_talks_urls import get_talks_urls
 
 
 _PAGINATE_BY = 20
 
 
-def get_downloadable_talks(talks_urls):
+def get_downloadable_talks():
+    talks_urls = get_talks_urls()
     num_urls = len(talks_urls)
     downloadable_talks = []
     for index, talk_url in enumerate(talks_urls):
