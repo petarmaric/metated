@@ -46,7 +46,10 @@ def _guess_year(talk_url, soup):
     if match:
         return match.group(1)
     else:
-        logging.debug("Failed to guess the publishing year of '%s'", talk_url)
+        logging.warning(
+            "Failed to guess both the publishing and filming year of '%s'",
+            talk_url
+        )
         return 'Unknown'
 
 
