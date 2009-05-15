@@ -21,6 +21,8 @@ def get_downloadable_talks():
             downloadable_talks.append(get_talk_info(talk_url))
         except NoDownloadsFound, e:
             logging.error("No downloads for '%s', skipping", talk_url)
+        except Exception, e:
+            logging.error("Skipping '%s', reason: %s", talk_url, e)
     logging.info(
         "Found %d downloadable talks in total",
         len(downloadable_talks)
