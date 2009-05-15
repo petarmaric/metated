@@ -36,9 +36,7 @@ def _guess_year(talk_url, soup):
     
     Returns year as string, or 'Unknown' if no date was found.
     """
-    year_txt = soup.find(
-        id='videoPlayerSWF'
-    ).findNextSibling('script').string
+    year_txt = soup.find(id='videoPlayerSWF').findNextSibling('script').string
     match = _FILMING_YEAR_RE.search(year_txt)
     if match is None:
         logging.debug("Failed to guess the filming year of '%s'", talk_url)
