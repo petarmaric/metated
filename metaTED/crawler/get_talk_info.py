@@ -53,6 +53,27 @@ def _guess_year(talk_url, soup):
         return 'Unknown'
 
 
+def _guess_author(talk_url, soup):
+    """
+    Tries to guess the author, or returns 'Unknown' if no author was found.
+    """
+    element = soup.find(id='tagline').findNextSibling('h3')
+    if element:
+        author = element.string.split('About ', 1)[1]
+        # Remove html enitites
+        author = _HTML_ENTITY_RE.sub('', author)
+        # Remove invalid file name characters
+        author = _INVALID_FILE_NAME_CHARS_RE.sub('', author)
+        # Should be clean now
+        return author
+    else:
+        logging.warning(
+            "Failed to guess the author of '%s'",
+            talk_url
+        )
+        return 'Unknown'
+
+
 def _guess_file_base_name(soup):
     """
     Returns a user-friendly file base name, guessed from the talk title.
@@ -120,6 +141,7 @@ def _get_talk_info(talk_url):
     
     return {
         'year': _guess_year(talk_url, soup),
+        'author': _guess_author(talk_url, soup),
         'qualities': qualities,
     }
 
