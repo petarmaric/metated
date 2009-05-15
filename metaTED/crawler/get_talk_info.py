@@ -29,6 +29,18 @@ class NoDownloadsFound(Exception):
     pass
 
 
+def _clean_up_file_name(file_name, replace_first_colon_with_dash=False):
+    if replace_first_colon_with_dash:
+        # Turns 'Barry Schuler: Genomics' into 'Barry Schuler - Genomics'
+        file_name = file_name.replace(': ', ' - ', 1)
+    # Remove html enitites
+    file_name = _HTML_ENTITY_RE.sub('', file_name)
+    # Remove invalid file name characters
+    file_name = _INVALID_FILE_NAME_CHARS_RE.sub('', file_name)
+    # Should be clean now
+    return file_name
+
+
 def _guess_year(talk_url, soup):
     """
     Tries to guess the filming year, or if it's not available - the publishing
@@ -57,13 +69,7 @@ def _guess_author(talk_url, soup):
     """
     element = soup.find(id='tagline').findNextSibling('h3')
     if element:
-        author = element.string.split('About ', 1)[1]
-        # Remove html enitites
-        author = _HTML_ENTITY_RE.sub('', author)
-        # Remove invalid file name characters
-        author = _INVALID_FILE_NAME_CHARS_RE.sub('', author)
-        # Should be clean now
-        return author
+        return _clean_up_file_name(element.string.split('About ', 1)[1])
     else:
         logging.warning(
             "Failed to guess the author of '%s'",
@@ -71,22 +77,6 @@ def _guess_author(talk_url, soup):
         )
         return 'Unknown'
 
-
-def _guess_file_base_name(soup):
-    """
-    Returns a user-friendly file base name, guessed from the talk title.
-    """
-    # Guess talk title from <title> tag
-    title = soup.html.head.title.string.split('|')[0].strip()
-    # Turns 'Barry Schuler: Genomics' into 'Barry Schuler - Genomics'
-    file_base_name = title.replace(': ', ' - ', 1)
-    # Remove html enitites
-    file_base_name = _HTML_ENTITY_RE.sub('', file_base_name)
-    # Remove invalid file name characters
-    file_base_name = _INVALID_FILE_NAME_CHARS_RE.sub('', file_base_name)
-    # Should be clean now
-    return file_base_name
-    
 
 def _find_download_url(soup, quality_marker):
     """
@@ -99,7 +89,10 @@ def _find_download_url(soup, quality_marker):
 
 def _get_talk_info(talk_url):
     soup = BeautifulSoup(urlread(talk_url))
-    file_base_name = _guess_file_base_name(soup)
+    file_base_name = _clean_up_file_name(
+        soup.html.head.title.string.split('|')[0].strip(),
+        True
+    )
     
     # Try to find download URLs for all qualities
     qualities_found = []
