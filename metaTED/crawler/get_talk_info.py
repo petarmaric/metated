@@ -23,6 +23,7 @@ _HTML_ENTITY_RE = re.compile(r'&(#?[xX]?[0-9a-fA-F]+|\w{1,8});')
 _INVALID_FILE_NAME_CHARS_RE = re.compile('[^\w\.\- ]+')
 _FILMING_YEAR_RE = re.compile('fd:\"\w+ (\d+)\",')
 _PUBLISHING_YEAR_RE = re.compile('pd:\"\w+ (\d+)\",')
+_THEME_RE = re.compile('Other talks from &quot;(.+)&quot;')
 
 
 class NoDownloadsFound(Exception):
@@ -76,6 +77,23 @@ def _guess_author(talk_url, soup):
             talk_url
         )
         return 'Unknown'
+
+
+def _guess_theme(talk_url, soup):
+    """
+    Tries to guess the talks theme, or returns 'Unknown' if no theme was found.
+    """
+    element = soup.find('div', 'related').h3
+    if element:
+        match = _THEME_RE.search(element.string)
+        if match:
+            return _clean_up_file_name(match.group(1), True)
+    
+    logging.warning(
+        "Failed to guess the theme of '%s'",
+        talk_url
+    )
+    return 'Unknown'
 
 
 def _find_download_url(soup, quality_marker):
@@ -133,6 +151,7 @@ def _get_talk_info(talk_url):
     return {
         'year': _guess_year(talk_url, soup),
         'author': _guess_author(talk_url, soup),
+        'theme': _guess_theme(talk_url, soup),
         'qualities': qualities,
     }
 
