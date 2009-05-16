@@ -4,14 +4,14 @@ import metaTED
 from metaTED.cache import cache
 
 
-CRAWLER_RETRY_TIMES = 5
+_DEFAULT_RETRY_TIMES = 5
 
 
 _opener = urllib2.build_opener()
 _opener.addheaders = [('User-agent', 'metaTED/%s' % metaTED.__version__)]
 
 
-def urlread(fullurl):
+def urlread(fullurl, max_retries=_DEFAULT_RETRY_TIMES):
     # Check in-memory cache before requesting url
     logging.debug("Searching cache for '%s' contents...", fullurl)
     if fullurl in cache:
@@ -20,20 +20,20 @@ def urlread(fullurl):
     logging.debug("Failed to find the cached version of '%s' contents", fullurl)
 
     saved_exception = None
-    for try_num in xrange(1, CRAWLER_RETRY_TIMES+1):
+    for try_num in xrange(1, max_retries+1):
         try:
             logging.debug(
                 "Requesting '%s' (try %d of %d)...",
                 fullurl,
                 try_num,
-                CRAWLER_RETRY_TIMES
+                max_retries
             )
             data = _opener.open(fullurl).read()
             logging.debug("Successfully read data from '%s'", fullurl)
             cache[fullurl] = data
             return data
         except urllib2.URLError, e:
-            if try_num == CRAWLER_RETRY_TIMES:
+            if try_num == max_retries:
                 log_func = logging.fatal
                 message = "Giving up! Could not read data from '%s': %s"
                 saved_exception = e
