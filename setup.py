@@ -20,7 +20,7 @@ setup(
     url='http://bitbucket.org/petar/metated/',
     download_url='http://pypi.python.org/pypi/metaTED',
     license='BSD',
-    author='Petar Marić',
+    author='Petar Maric',
     author_email='petar.maric@gmail.com',
     description='Creates metalink files of TED talks for easier downloading',
     long_description=open('README').read(),
