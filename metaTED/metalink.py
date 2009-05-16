@@ -1,3 +1,4 @@
+import os
 import logging
 from email.utils import formatdate
 from jinja2 import Environment, PackageLoader
@@ -45,8 +46,12 @@ def _get_group_downloads_by(downloadable_talks):
     return groups
 
 
-def generate_metalinks():
-    # Above everything else, make sure downloadable_talks can be calculated
+def generate_metalinks(output_dir=None):
+    output_dir = os.path.abspath(output_dir)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    # Make sure downloadable_talks can be calculated
     downloadable_talks = get_downloadable_talks()
     
     # Prepare the template upfront, because it can be reused between metalinks
@@ -74,5 +79,8 @@ def generate_metalinks():
                 'quality': quality,
                 'group_by': group_by,
                 'talks': _get_downloads(downloadable_talks, quality, group_by)
-            }).dump(metalink_file_name, encoding='utf-8')
+            }).dump(
+                os.path.join(output_dir, metalink_file_name),
+                encoding='utf-8'
+            )
             logging.info("Generated '%s' metalink", metalink_file_name)
