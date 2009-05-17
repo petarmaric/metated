@@ -31,7 +31,7 @@ setup(
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.5',
+        'Programming Language :: Python :: 2.4',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Indexing/Search',
         'Topic :: Utilities',
