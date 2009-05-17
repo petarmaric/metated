@@ -12,6 +12,9 @@ except ImportError:
     from email.Utils import formatdate # Python 2.4 fallback
 
 
+_METALINK_BASE_URL = "http://metated.petarmaric.com/metalinks/%s"
+
+
 def _get_downloads(downloadable_talks, quality, group_by=None):
     downloads = []
     for talk_info in downloadable_talks:
@@ -34,6 +37,11 @@ def _get_downloads(downloadable_talks, quality, group_by=None):
 def _get_metalink_file_name(quality, group_by):
     group_part = group_by and "-grouped-by-%s" % group_by or ''
     return "TED-talks%s-in-%s-quality.metalink" % (group_part, quality)
+
+
+def _get_metalink_description(quality, group_by):
+    group_part = group_by and " grouped by %s" % group_by or ''
+    return "Download TED talks%s encoded in %s quality" % (group_part, quality)
 
 
 def _get_group_downloads_by(downloadable_talks):
@@ -71,20 +79,33 @@ def generate_metalinks(output_dir=None):
         cached_storage['first_published_on'] = first_published_on = refresh_date
     
     # Generate all metalink variants
+    metalinks = []
     for group_by in _get_group_downloads_by(downloadable_talks):
         for quality in AVAILABLE_VIDEO_QUALITIES.keys():
             metalink_file_name = _get_metalink_file_name(quality, group_by)
+            metalink_url = _METALINK_BASE_URL % metalink_file_name
+            metalink_description = _get_metalink_description(quality, group_by)
             logging.debug("Generating '%s' metalink...", metalink_file_name)
             template.stream({
-                'metalink_file_name': metalink_file_name,
+                'metalink_url': metalink_url,
                 'metaTED_version': __version__,
                 'first_published_on': first_published_on,
                 'refresh_date': refresh_date,
-                'quality': quality,
-                'group_by': group_by,
+                'description': metalink_description,
                 'talks': _get_downloads(downloadable_talks, quality, group_by)
             }).dump(
                 os.path.join(output_dir, metalink_file_name),
                 encoding='utf-8'
             )
+            metalinks.append({
+                'download_url': metalink_url,
+                'description': metalink_description
+            })
             logging.info("Generated '%s' metalink", metalink_file_name)
+    return {
+        'metaTED_version': __version__,
+        'first_published_on': first_published_on,
+        'refresh_date': refresh_date,
+        'num_downloadable_talks': len(downloadable_talks),
+        'metalinks': metalinks
+    }
