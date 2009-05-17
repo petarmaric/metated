@@ -1,0 +1,60 @@
+metaTED is a tool that makes it easy to download all of the `TED talks`_. It
+does so by creating over 8 `metalinks`_ of TED talks varying in both the
+quality levels and possible talk groupings by directory. Features include:
+
+    * Creates talks with informative file names - i.e.
+      ``Unconventional Explanations/Hans Rosling on HIV - New facts and stunning data visuals.mp4``
+      instead of original ``HansRosling_2009_480.mp4``.
+
+    * Tries hard to get all of the talks, or at least most of them - with a good
+      reason if some have failed.
+
+    * More choice - creates one metalink per available quality level
+      (currently low and high).
+
+    * More choice - creates one metalink per available talk grouping, with all
+      talks belonging to the same group placed inside a common directory. The
+      possible talk groupings are extracted from talks metadata (currently
+      filming/publishing year, talk theme and author).
+
+    * Aggressive caching throughout the project, to avoid expensive network/CPU
+      operations as much as possible. Proper cache invalidation included.
+
+    * High levels of fault tolerance. 
+
+    * Simple, yet powerful homegrown web crawler. 
+
+    * Flexible and extensible software design with changes in mind.
+
+    * Provides both the console script and a public API.
+
+.. _metalinks: http://en.wikipedia.org/wiki/Metalink
+.. _TED talks: http://www.ted.com/
+
+Downloading TED talks
+=====================
+
+If you just want to `download TED talks`_, you don't need to install this
+package, or even Python. All you need to do is get a
+`download client that supports the Metalink standard`_ and choose one of the
+`daily updated metalinks`_.
+
+.. _download TED talks: http://metated.petarmaric.com/
+.. _download client that supports the Metalink standard:
+        http://en.wikipedia.org/wiki/Metalink#Client_programs
+.. _daily updated metalinks: http://metated.petarmaric.com/
+
+Installing and running metaTED
+==============================
+
+metaTED is available as an `easy-install`_-able package, you can install it with
+``easy_install -U metaTED``, or ``pip install metaTED`` if you have `pip`_. You
+can run it with ``metaTED``, or ``metaTED -h`` to get help and the list of all
+available options.
+
+The project itself is `hosted on bitbucket`_, from where you can get the code
+and report bugs.
+
+.. _easy-install: http://peak.telecommunity.com/DevCenter/EasyInstall
+.. _pip: http://pip.openplans.org/
+.. _hosted on bitbucket: http://bitbucket.org/petar/metated/
