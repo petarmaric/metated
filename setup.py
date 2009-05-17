@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
+import ez_setup
+ez_setup.use_setuptools()
+
+import os
 import sys
+from setuptools import setup, find_packages
+
+import metaTED
 
 
-if sys.platform == 'win32':
-    from setuptools import setup
-    kw = {
-        'entry_points': {
-            'console_scripts': ['metaTED=metaTED:main']
-        },
-        'install_requires': open('requirements.txt').read().splitlines()
-    }
-else:
-    from distutils.core import setup
-    kw = {'scripts': ['scripts/metaTED']}
+if sys.version_info < (2, 4):
+    print 'ERROR: metaTED requires at least Python 2.4 to run.'
+    sys.exit(1)
+
 
 setup(
     name='metaTED',
-    version=__import__('metaTED').__version__,
+    version=metaTED.__version__,
     url='http://bitbucket.org/petar/metated/',
     download_url='http://pypi.python.org/pypi/metaTED',
     license='BSD',
@@ -24,6 +24,7 @@ setup(
     author_email='petar.maric@gmail.com',
     description='Creates metalink files of TED talks for easier downloading',
     long_description=open('README').read(),
+    zip_safe=False,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
@@ -37,7 +38,10 @@ setup(
     ],
     keywords='TED metalink download video',
     platforms='any',
-    packages=['metaTED', 'metaTED.crawler'],
-    data_files=[('metaTED/templates', ['metaTED/templates/template.metalink'])],
-    **kw
+    packages=find_packages(),
+    include_package_data=True,
+    entry_points={
+        'console_scripts': ['metaTED=metaTED:main']
+    },
+    install_requires=open('requirements.txt').read().splitlines()
 )
