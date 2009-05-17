@@ -1,11 +1,15 @@
 import os
 import logging
-from email.utils import formatdate
 from jinja2 import Environment, PackageLoader
 from metaTED import __version__
 from metaTED.cache import cached_storage
 from metaTED.crawler.get_downloadable_talks import get_downloadable_talks
 from metaTED.crawler.get_talk_info import AVAILABLE_VIDEO_QUALITIES
+
+try:
+    from email.utils import formatdate
+except ImportError:
+    from email.Utils import formatdate # Python 2.4 fallback
 
 
 def _get_downloads(downloadable_talks, quality, group_by=None):
