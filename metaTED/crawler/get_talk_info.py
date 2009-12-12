@@ -9,11 +9,11 @@ from metaTED.crawler import urlread
 
 AVAILABLE_VIDEO_QUALITIES = {
     'low': {
-        'marker': 'Video to desktop (Zipped MP4)',
-        'file_extension': 'zip',
+        'marker': 'Download video to desktop (MP4)',
+        'file_extension': 'mp4',
     },
     'high': {
-        'marker': 'Watch this talk as high-res video',
+        'marker': 'Watch high-res video (MP4)',
         'file_extension': 'mp4',
     },
 }
