@@ -11,6 +11,12 @@ TALKS_LIST_URLS = "http://www.ted.com/index.php/talks/list/page/%d"
 TOTAL_PAGES_RE = re.compile("Showing page \d+ of (\d+)")
 
 
+TALKS_URLS_BLACKLIST = [
+    'http://www.ted.com/talks/rokia_traore_sings_m_bifo.html', # No downloads
+    'http://www.ted.com/talks/rokia_traore_sings_kounandi.html', # No downloads
+]
+
+
 def _read_page(page_num):
     return urlread(TALKS_LIST_URLS % page_num)
 
@@ -39,6 +45,10 @@ def _get_talks_urls():
     urls = []
     for page in xrange(1, _get_num_pages()+1): # Talk list pages are 1-indexed
         urls.extend(_get_talks_urls_from_page(page))
+    
+    # Remove the well-known problematic talk URLs (i.e. no downloads available)
+    urls = filter(lambda x: x not in TALKS_URLS_BLACKLIST, urls)
+    
     logging.info("Found %d talk url(s) in total", len(urls))
     return urls
 
