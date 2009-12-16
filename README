@@ -58,3 +58,11 @@ and report bugs.
 .. _easy-install: http://peak.telecommunity.com/DevCenter/EasyInstall
 .. _pip: http://pip.openplans.org/
 .. _hosted on bitbucket: http://bitbucket.org/petar/metated/
+
+New in metaTED 1.0.1
+====================
+
+    * Blacklisted a couple of talk URLs as they haven't had any downloads for
+      quite a while.
+
+    * Updated video download markers as TED updated their HTML layout.
