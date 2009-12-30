@@ -14,6 +14,9 @@ TOTAL_PAGES_RE = re.compile("Showing page \d+ of (\d+)")
 TALKS_URLS_BLACKLIST = [
     'http://www.ted.com/talks/rokia_traore_sings_m_bifo.html', # No downloads
     'http://www.ted.com/talks/rokia_traore_sings_kounandi.html', # No downloads
+    'http://www.ted.com/talks/cat_laine_engineering_a_better_life_for_all.html', # No downloads
+    'http://www.ted.com/talks/michael_sandel_what_s_the_right_thing_to_do.html', # No downloads
+    'http://www.ted.com/talks/steve_jobs_how_to_live_before_you_die.html', # No downloads
 ]
 
 
