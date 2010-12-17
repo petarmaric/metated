@@ -15,18 +15,6 @@ TALKS_URLS_BLACKLIST = [
     # No downloads
     'http://www.ted.com/talks/rokia_traore_sings_m_bifo.html',
     'http://www.ted.com/talks/rokia_traore_sings_kounandi.html',
-    'http://www.ted.com/talks/cat_laine_engineering_a_better_life_for_all.html',
-    'http://www.ted.com/talks/michael_sandel_what_s_the_right_thing_to_do.html',
-    'http://www.ted.com/talks/steve_jobs_how_to_live_before_you_die.html',
-    'http://www.ted.com/talks/edwidge_danticat_stories_of_haiti.html',
-    'http://www.ted.com/talks/matt_weinstein_what_bernie_madoff_couldn_t_steal_from_me.html',
-    'http://www.ted.com/talks/robert_sapolsky_the_uniqueness_of_humans.html',
-    'http://www.ted.com/talks/randy_pausch_really_achieving_your_childhood_dreams.html',
-    
-    # Internal server error + invalid HTML
-    'http://www.ted.com/talks/ex_moonie_diane_benscoter_how_cults_think.html',
-    'http://www.ted.com/talks/yann_arthus_bertrand_captures_fragile_earth_in_wide_angle.html',
-    'http://www.ted.com/talks/frank_gehry_as_a_young_rebel.html',
 ]
 
 
