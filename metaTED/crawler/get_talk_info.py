@@ -30,6 +30,10 @@ class NoDownloadsFound(Exception):
     pass
 
 
+class ExternallyHostedDownloads(Exception):
+    pass
+
+
 def _clean_up_file_name(file_name, replace_first_colon_with_dash=False):
     if replace_first_colon_with_dash:
         # Turns 'Barry Schuler: Genomics' into 'Barry Schuler - Genomics'
@@ -111,6 +115,9 @@ def _get_talk_info(talk_url):
         soup.html.head.title.string.split('|')[0].strip(),
         True
     )
+    
+    if soup.find('div', 'external_player'): # Downloads not hosted by TED!
+        raise ExternallyHostedDownloads(talk_url)
     
     # Try to find download URLs for all qualities
     qualities_found = []

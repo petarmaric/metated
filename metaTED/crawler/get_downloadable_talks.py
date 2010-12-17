@@ -1,5 +1,5 @@
 import logging
-from metaTED.crawler.get_talk_info import get_talk_info, NoDownloadsFound
+from metaTED.crawler.get_talk_info import get_talk_info, ExternallyHostedDownloads, NoDownloadsFound
 from metaTED.crawler.get_talks_urls import get_talks_urls
 
 
@@ -19,6 +19,11 @@ def get_downloadable_talks():
                     num_urls
                 )
             downloadable_talks.append(get_talk_info(talk_url))
+        except ExternallyHostedDownloads, e:
+            logging.info(
+                "Downloads for '%s' are not hosted by TED, skipping",
+                talk_url
+            )
         except NoDownloadsFound, e:
             logging.error("No downloads for '%s', skipping", talk_url)
         except Exception, e:
