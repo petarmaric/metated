@@ -59,7 +59,8 @@ and report bugs.
 .. _pip: http://pip.openplans.org/
 .. _hosted on bitbucket: http://bitbucket.org/petar/metated/
 
-New in metaTED 1.0.3
+New in metaTED 1.0.4
 ====================
 
-    * Blacklisted 7 more talk URLs with no downloads.
+    * Programmatically blacklisted all talk URLs with externally hosted
+      downloads.
