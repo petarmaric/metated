@@ -38,7 +38,7 @@ def _clean_up_file_name(file_name, replace_first_colon_with_dash=False):
     if replace_first_colon_with_dash:
         # Turns 'Barry Schuler: Genomics' into 'Barry Schuler - Genomics'
         file_name = file_name.replace(': ', ' - ', 1)
-    # Remove html enitites
+    # Remove html entities
     file_name = _HTML_ENTITY_RE.sub('', file_name)
     # Remove invalid file name characters
     file_name = _INVALID_FILE_NAME_CHARS_RE.sub('', file_name)
