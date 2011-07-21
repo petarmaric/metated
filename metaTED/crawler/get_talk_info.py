@@ -71,7 +71,9 @@ def _guess_author(talk_url, soup):
     """
     Tries to guess the author, or returns 'Unknown' if no author was found.
     """
-    element = soup.find(id='accordion').findAll('div', recursive=False)[1].p.strong
+    element = soup.find(id='accordion').find(
+        'a', text='About The Speaker'
+    ).next.next.p.strong
     if element:
         return _clean_up_file_name(element.string)
     else:
