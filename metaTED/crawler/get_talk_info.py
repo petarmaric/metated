@@ -9,11 +9,15 @@ from metaTED.crawler import urlread
 
 AVAILABLE_VIDEO_QUALITIES = {
     'low': {
-        'marker': 'Download video to desktop (MP4)',
+        'marker': 'Low-res video (MP4)',
+        'file_extension': 'mp4',
+    },
+    'standard': {
+        'marker': 'Download to desktop (MP4)',
         'file_extension': 'mp4',
     },
     'high': {
-        'marker': 'Watch high-res video (MP4)',
+        'marker': 'High-res video (MP4)',
         'file_extension': 'mp4',
     },
 }
