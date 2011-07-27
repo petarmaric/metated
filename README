@@ -10,7 +10,7 @@ quality levels and possible talk groupings by directory. Features include:
       reason if some have failed.
 
     * More choice - creates one metalink per available quality level
-      (currently low and high).
+      (currently low, standard and high).
 
     * More choice - creates one metalink per available talk grouping, with all
       talks belonging to the same group placed inside a common directory. The
@@ -59,7 +59,8 @@ and report bugs.
 .. _pip: http://pip.openplans.org/
 .. _hosted on bitbucket: http://bitbucket.org/petar/metated/
 
-New in metaTED 1.0.7
+New in metaTED 1.0.8
 ====================
 
-    * Updated author markers as TED updated their HTML layout.
+    * Updated video download markers as TED updated their HTML layout and
+      introduced a new video quality level.
