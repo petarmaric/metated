@@ -1,3 +1,8 @@
+metaTED 1.0.8 (July 27, 2011)
+
+    * Updated video download markers as TED updated their HTML layout and
+      introduced a new video quality level.
+
 metaTED 1.0.7 (July 21, 2011)
 
     * Updated author markers as TED updated their HTML layout.
