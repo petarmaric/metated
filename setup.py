@@ -8,8 +8,8 @@ from setuptools import setup, find_packages
 import metaTED
 
 
-if sys.version_info < (2, 4):
-    print 'ERROR: metaTED requires at least Python 2.4 to run.'
+if sys.version_info < (2, 6):
+    print 'ERROR: metaTED requires at least Python 2.6 to run.'
     sys.exit(1)
 
 
@@ -30,7 +30,7 @@ setup(
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.4',
+        'Programming Language :: Python :: 2.6',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Indexing/Search',
         'Topic :: Utilities',
