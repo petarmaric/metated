@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-import ez_setup
-ez_setup.use_setuptools()
+from distribute_setup import use_setuptools
+use_setuptools() 
 
-import os
 import sys
 from setuptools import setup, find_packages
+
 
 import metaTED
 
