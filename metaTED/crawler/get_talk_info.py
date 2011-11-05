@@ -92,15 +92,18 @@ def _guess_theme(talk_url, soup):
     """
     Tries to guess the talks theme, or returns 'Unknown' if no theme was found.
     """
-    element = soup.find('ul', 'relatedThemes').li.a
-    if element:
+    try:
+        element = soup.find('ul', 'relatedThemes notranslate').li.a
         return _clean_up_file_name(element.string)
-
-    logging.warning(
-        "Failed to guess the theme of '%s'",
-        talk_url
-    )
-    return 'Unknown'
+    except AttributeError:
+        # If one of the child nodes isn't found in the parse tree Beautiful Soup
+        # will return `None`. Trying to access any of the `None`s child nodes
+        # will raise an `AttributeError`.  
+        logging.warning(
+            "Failed to guess the theme of '%s'",
+            talk_url
+        )
+        return 'Unknown'
 
 
 def _find_download_url(soup, quality_marker):
