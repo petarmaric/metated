@@ -1,13 +1,12 @@
 import logging
-import re
-from urlparse import urljoin
-from BeautifulSoup import BeautifulSoup
+from lxml.cssselect import CSSSelector
+from lxml import html
 from metaTED import SITE_URL
-from metaTED.crawler import urlread
+from urlparse import urljoin
 
 
 TALKS_LIST_URL = "http://www.ted.com/talks/quick-list"
-TOTAL_TALKS_RE = re.compile("Showing \d+ - \d+ of\s+(\d+)")
+_TALKS_URLS_SELECTOR = CSSSelector('table.downloads tr td:nth-child(3) a')
 
 
 TALKS_URLS_BLACKLIST = [
@@ -19,11 +18,10 @@ TALKS_URLS_BLACKLIST = [
 
 def get_talks_urls():
     logging.debug('Looking for talk urls...')
-    soup = BeautifulSoup(urlread(TALKS_LIST_URL))
-    talks_table = soup.find('table', 'downloads')
+    document = html.parse(TALKS_LIST_URL)
     talks_urls = [
-        urljoin(SITE_URL, tr.findAll('td')[2].a['href'])
-        for tr in talks_table.findAll('tr')[1:] # Skip 1st 'tr', used as header
+        urljoin(SITE_URL, a.get('href'))
+        for a in _TALKS_URLS_SELECTOR(document)
     ]
     
     # Remove the well-known problematic talk URLs (i.e. no downloads available)
