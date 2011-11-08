@@ -1,10 +1,10 @@
 import re
 import logging
+from lxml.cssselect import CSSSelector
+from lxml import html
 from urlparse import urljoin
-from BeautifulSoup import BeautifulSoup
 from metaTED import SITE_URL
 from metaTED.cache import cached_storage
-from metaTED.crawler import urlread
 
 
 AVAILABLE_VIDEO_QUALITIES = {
@@ -25,8 +25,16 @@ AVAILABLE_VIDEO_QUALITIES = {
 
 _HTML_ENTITY_RE = re.compile(r'&(#?[xX]?[0-9a-fA-F]+|\w{1,8});')
 _INVALID_FILE_NAME_CHARS_RE = re.compile('[^\w\.\- ]+')
+
+_EXTERNALLY_HOSTED_DOWNLOADS_SELECTOR = CSSSelector('div#external_player')
+
+_VIDEO_PLAYER_SELECTOR = CSSSelector('div#videoPlayerSWF + script')
 _FILMING_YEAR_RE = re.compile('fd:\"\w+ (\d+)\",')
 _PUBLISHING_YEAR_RE = re.compile('pd:\"\w+ (\d+)\",')
+
+_AUTHOR_SELECTOR = CSSSelector('div#accordion div p strong')
+
+_THEME_SELECTOR = CSSSelector('ul.relatedThemes li a')
 
 
 class NoDownloadsFound(Exception):
@@ -49,80 +57,79 @@ def _clean_up_file_name(file_name, replace_first_colon_with_dash=False):
     return file_name
 
 
-def _guess_year(talk_url, soup):
+def _guess_year(talk_url, document):
     """
     Tries to guess the filming year, or if it's not available - the publishing
     year.
     
     Returns year as string, or 'Unknown' if no date was found.
     """
-    year_txt = soup.find(id='videoPlayerSWF').findNextSibling('script').string
-    match = _FILMING_YEAR_RE.search(year_txt)
-    if match is None:
-        logging.debug("Failed to guess the filming year of '%s'", talk_url)
-        match = _PUBLISHING_YEAR_RE.search(year_txt)
-    if match:
-        return match.group(1)
-    else:
-        logging.warning(
-            "Failed to guess both the publishing and filming year of '%s'",
-            talk_url
-        )
-        return 'Unknown'
+    elements = _VIDEO_PLAYER_SELECTOR(document)
+    if elements:
+        year_txt = elements[0].text
+        match = _FILMING_YEAR_RE.search(year_txt)
+        if match is None:
+            logging.debug("Failed to guess the filming year of '%s'", talk_url)
+            match = _PUBLISHING_YEAR_RE.search(year_txt)
+        if match:
+            return match.group(1)
+    
+    logging.warning(
+        "Failed to guess both the publishing and filming year of '%s'",
+        talk_url
+    )
+    return 'Unknown'
 
 
-def _guess_author(talk_url, soup):
+def _guess_author(talk_url, document):
     """
     Tries to guess the author, or returns 'Unknown' if no author was found.
     """
-    element = soup.find(id='accordion').find(
-        'a', text='About The Speaker'
-    ).next.next.p.strong
-    if element:
-        return _clean_up_file_name(element.string)
-    else:
-        logging.warning(
-            "Failed to guess the author of '%s'",
-            talk_url
-        )
-        return 'Unknown'
+    elements = _AUTHOR_SELECTOR(document)
+    if elements:
+        return _clean_up_file_name(elements[0].text)
+    
+    logging.warning(
+        "Failed to guess the author of '%s'",
+        talk_url
+    )
+    return 'Unknown'
 
 
-def _guess_theme(talk_url, soup):
+def _guess_theme(talk_url, document):
     """
     Tries to guess the talks theme, or returns 'Unknown' if no theme was found.
     """
-    try:
-        element = soup.find('ul', 'relatedThemes notranslate').li.a
-        return _clean_up_file_name(element.string)
-    except AttributeError:
-        # If one of the child nodes isn't found in the parse tree Beautiful Soup
-        # will return `None`. Trying to access any of the `None`s child nodes
-        # will raise an `AttributeError`.  
-        logging.warning(
-            "Failed to guess the theme of '%s'",
-            talk_url
-        )
-        return 'Unknown'
+    elements = _THEME_SELECTOR(document)
+    if elements:
+        return _clean_up_file_name(elements[0].text)
+    
+    logging.warning(
+        "Failed to guess the theme of '%s'",
+        talk_url
+    )
+    return 'Unknown'
 
 
-def _find_download_url(soup, quality_marker):
+def _find_download_url(document, quality_marker):
     """
     Returns download URL of a talk in requested video quality, or None if the
     talk can't be downloaded in that quality.
     """
-    element = soup.find(text=quality_marker)
-    return element and urljoin(SITE_URL, element.parent['href'])
+    elements = document.xpath("//a[text()='%s']" % quality_marker)
+    if elements:
+        return urljoin(SITE_URL, elements[0].get('href'))
 
 
 def _get_talk_info(talk_url):
-    soup = BeautifulSoup(urlread(talk_url))
+    document = html.parse(talk_url)
     file_base_name = _clean_up_file_name(
-        soup.html.head.title.string.split('|')[0].strip(),
+        document.find('/head/title').text.split('|')[0].strip(),
         True
     )
     
-    if soup.find('div', 'external_player'): # Downloads not hosted by TED!
+    # Downloads not hosted by TED!
+    if _EXTERNALLY_HOSTED_DOWNLOADS_SELECTOR(document):
         raise ExternallyHostedDownloads(talk_url)
     
     # Try to find download URLs for all qualities
@@ -130,7 +137,7 @@ def _get_talk_info(talk_url):
     qualities_missing = []
     qualities = {}
     for name, info in AVAILABLE_VIDEO_QUALITIES.items():
-        download_url = _find_download_url(soup, info['marker'])
+        download_url = _find_download_url(document, info['marker'])
         if download_url:
             qualities_found.append(name)
             qualities[name] = {
@@ -162,9 +169,9 @@ def _get_talk_info(talk_url):
             )
     
     return {
-        'year': _guess_year(talk_url, soup),
-        'author': _guess_author(talk_url, soup),
-        'theme': _guess_theme(talk_url, soup),
+        'year': _guess_year(talk_url, document),
+        'author': _guess_author(talk_url, document),
+        'theme': _guess_theme(talk_url, document),
         'qualities': qualities,
     }
 
