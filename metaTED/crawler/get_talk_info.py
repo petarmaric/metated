@@ -5,7 +5,6 @@ from lxml import html
 from os.path import splitext
 from urlparse import urljoin, urlsplit
 from metaTED import SITE_URL
-from metaTED.cache import cached_storage
 from metaTED.crawler.get_talks_urls import TALKS_LIST_URL
 
 
@@ -129,7 +128,7 @@ def _get_download_urls_dict(talk_url):
     )
 
 
-def _get_talk_info(talk_url):
+def get_talk_info(talk_url):
     document = html.parse(talk_url)
     file_base_name = _clean_up_file_name(
         document.find('/head/title').text.split('|')[0].strip(),
@@ -183,21 +182,3 @@ def _get_talk_info(talk_url):
         'theme': _guess_theme(talk_url, document),
         'qualities': qualities,
     }
-
-
-def get_talk_info(talk_url):
-    talks_info = cached_storage.get('talks_infos', {})
-    logging.debug("Searching cache for talk info on '%s'...", talk_url)
-    if talk_url in talks_info:
-        logging.debug("Found the cached version of '%s' talk info", talk_url)
-        return talks_info[talk_url]
-    
-    # Cache miss
-    logging.debug(
-        "Failed to find the cached version of '%s' talk info, calculating.",
-        talk_url
-    )
-    info = _get_talk_info(talk_url)
-    talks_info[talk_url] = info
-    cached_storage['talks_infos'] = talks_info
-    return info
