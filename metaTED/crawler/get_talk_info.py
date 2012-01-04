@@ -2,24 +2,17 @@ import re
 import logging
 from lxml.cssselect import CSSSelector
 from lxml import html
-from urlparse import urljoin
+from os.path import splitext
+from urlparse import urljoin, urlsplit
 from metaTED import SITE_URL
 from metaTED.cache import cached_storage
+from metaTED.crawler.get_talks_urls import TALKS_LIST_URL
 
 
 AVAILABLE_VIDEO_QUALITIES = {
-    'low': {
-        'marker': 'Low-res video (MP4)',
-        'file_extension': 'mp4',
-    },
-    'standard': {
-        'marker': 'Download to desktop (MP4)',
-        'file_extension': 'mp4',
-    },
-    'high': {
-        'marker': 'High-res video (MP4)',
-        'file_extension': 'mp4',
-    },
+    'low': 'Low',
+    'standard': 'Regular',
+    'high': 'High',
 }
 
 
@@ -35,6 +28,8 @@ _PUBLISHING_YEAR_RE = re.compile('pd:\"\w+ (\d+)\",')
 _AUTHOR_SELECTOR = CSSSelector('div#accordion div p strong')
 
 _THEME_SELECTOR = CSSSelector('ul.relatedThemes li a')
+
+_QUALITIES_XPATH_FMT = "//a[@href='%s']/ancestor::node()[name()='tr']/td[5]/a"
 
 
 class NoDownloadsFound(Exception):
@@ -55,6 +50,16 @@ def _clean_up_file_name(file_name, replace_first_colon_with_dash=False):
     file_name = _INVALID_FILE_NAME_CHARS_RE.sub('', file_name)
     # Should be clean now
     return file_name
+
+
+_talk_list_document_cache = None
+def _get_talk_list_document():
+    global _talk_list_document_cache
+    
+    if _talk_list_document_cache is None:
+        _talk_list_document_cache = html.parse(TALKS_LIST_URL)
+    
+    return _talk_list_document_cache
 
 
 def _guess_year(talk_url, document):
@@ -111,14 +116,17 @@ def _guess_theme(talk_url, document):
     return 'Unknown'
 
 
-def _find_download_url(document, quality_marker):
+def _get_download_urls_dict(talk_url):
     """
-    Returns download URL of a talk in requested video quality, or None if the
-    talk can't be downloaded in that quality.
+    Returns a dictionary of all download URLs for a given talk URL, mapping 
+    quality marker to the download URL.
     """
-    elements = document.xpath("//a[text()='%s']" % quality_marker)
-    if elements:
-        return urljoin(SITE_URL, elements[0].get('href'))
+    return dict(
+        (a.text.strip(), urljoin(SITE_URL, a.get('href')))
+        for a in _get_talk_list_document().xpath(
+            _QUALITIES_XPATH_FMT % urlsplit(talk_url).path
+        )
+    )
 
 
 def _get_talk_info(talk_url):
@@ -136,13 +144,14 @@ def _get_talk_info(talk_url):
     qualities_found = []
     qualities_missing = []
     qualities = {}
-    for name, info in AVAILABLE_VIDEO_QUALITIES.items():
-        download_url = _find_download_url(document, info['marker'])
+    quality_marker_to_download_url = _get_download_urls_dict(talk_url)
+    for name, marker in AVAILABLE_VIDEO_QUALITIES.items():
+        download_url = quality_marker_to_download_url.get(marker)
         if download_url:
             qualities_found.append(name)
             qualities[name] = {
                 'download_url': download_url,
-                'file_name': "%s.%s" % (file_base_name, info['file_extension'])
+                'file_name': "%s%s" % (file_base_name, splitext(download_url)[1])
             }
         else:
             logging.error(
