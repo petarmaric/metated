@@ -21,8 +21,11 @@ _INVALID_FILE_NAME_CHARS_RE = re.compile('[^\w\.\- ]+')
 _EXTERNALLY_HOSTED_DOWNLOADS_SELECTOR = CSSSelector('div#external_player')
 
 _VIDEO_PLAYER_SELECTOR = CSSSelector('div#videoPlayerSWF + script')
-_FILMING_YEAR_RE = re.compile('fd:\"\w+ (\d+)\",')
-_PUBLISHING_YEAR_RE = re.compile('pd:\"\w+ (\d+)\",')
+_VIDEO_PLAYER_METADATA = {
+    'event': re.compile('en:\"(.+)\",'),
+    'filming-year': re.compile('fd:\"\w+ (\d+)\",'),
+    'publishing-year': re.compile('pd:\"\w+ (\d+)\",'),
+}
 
 _AUTHOR_SELECTOR = CSSSelector('div#accordion div p strong')
 
@@ -61,33 +64,14 @@ def _get_talk_list_document():
     return _talk_list_document_cache
 
 
-def _guess_filming_year(talk_url, document):
-    """
-    Tries to guess the filming year, or returns 'Unknown' if no filming year was
-    found.
-    """
+def _guess_video_player_metadata(name, regexp, talk_url, document):
     elements = _VIDEO_PLAYER_SELECTOR(document)
     if elements:
-        match = _FILMING_YEAR_RE.search(elements[0].text)
+        match = regexp.search(elements[0].text)
         if match:
-            return match.group(1)
+            return _clean_up_file_name(match.group(1))
     
-    logging.warning("Failed to guess the filming year of '%s'", talk_url)
-    return 'Unknown'
-
-
-def _guess_publishing_year(talk_url, document):
-    """
-    Tries to guess the publishing year, or returns 'Unknown' if no publishing
-    year was found.
-    """
-    elements = _VIDEO_PLAYER_SELECTOR(document)
-    if elements:
-        match = _PUBLISHING_YEAR_RE.search(elements[0].text)
-        if match:
-            return match.group(1)
-    
-    logging.warning("Failed to guess the publishing year of '%s'", talk_url)
+    logging.warning("Failed to guess the %s of '%s'", name, talk_url)
     return 'Unknown'
 
 
@@ -182,10 +166,13 @@ def get_talk_info(talk_url):
                 talk_url
             )
     
-    return {
-        'filming-year': _guess_filming_year(talk_url, document),
-        'publishing-year': _guess_publishing_year(talk_url, document),
+    talk_info = {
         'author': _guess_author(talk_url, document),
         'theme': _guess_theme(talk_url, document),
         'qualities': qualities,
     }
+    talk_info.update(
+        (name, _guess_video_player_metadata(name, regexp, talk_url, document))
+        for name, regexp in _VIDEO_PLAYER_METADATA.items()
+    )
+    return talk_info
