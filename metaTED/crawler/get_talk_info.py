@@ -61,27 +61,33 @@ def _get_talk_list_document():
     return _talk_list_document_cache
 
 
-def _guess_year(talk_url, document):
+def _guess_filming_year(talk_url, document):
     """
-    Tries to guess the filming year, or if it's not available - the publishing
-    year.
-    
-    Returns year as string, or 'Unknown' if no date was found.
+    Tries to guess the filming year, or returns 'Unknown' if no filming year was
+    found.
     """
     elements = _VIDEO_PLAYER_SELECTOR(document)
     if elements:
-        year_txt = elements[0].text
-        match = _FILMING_YEAR_RE.search(year_txt)
-        if match is None:
-            logging.debug("Failed to guess the filming year of '%s'", talk_url)
-            match = _PUBLISHING_YEAR_RE.search(year_txt)
+        match = _FILMING_YEAR_RE.search(elements[0].text)
         if match:
             return match.group(1)
     
-    logging.warning(
-        "Failed to guess both the publishing and filming year of '%s'",
-        talk_url
-    )
+    logging.warning("Failed to guess the filming year of '%s'", talk_url)
+    return 'Unknown'
+
+
+def _guess_publishing_year(talk_url, document):
+    """
+    Tries to guess the publishing year, or returns 'Unknown' if no publishing
+    year was found.
+    """
+    elements = _VIDEO_PLAYER_SELECTOR(document)
+    if elements:
+        match = _PUBLISHING_YEAR_RE.search(elements[0].text)
+        if match:
+            return match.group(1)
+    
+    logging.warning("Failed to guess the publishing year of '%s'", talk_url)
     return 'Unknown'
 
 
@@ -177,7 +183,8 @@ def get_talk_info(talk_url):
             )
     
     return {
-        'year': _guess_year(talk_url, document),
+        'filming-year': _guess_filming_year(talk_url, document),
+        'publishing-year': _guess_publishing_year(talk_url, document),
         'author': _guess_author(talk_url, document),
         'theme': _guess_theme(talk_url, document),
         'qualities': qualities,

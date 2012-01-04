@@ -40,7 +40,7 @@ def _get_metalink_file_name(quality, group_by):
 
 
 def _get_metalink_description(quality, group_by):
-    group_part = group_by and " grouped by %s" % group_by or ''
+    group_part = group_by and " grouped by %s" % group_by.replace('-', ' ') or ''
     return "Download TED talks%s encoded in %s quality" % (group_part, quality)
 
 
