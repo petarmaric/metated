@@ -1,8 +1,8 @@
 import logging
-from lxml.cssselect import CSSSelector
 from lxml import html
-from metaTED import SITE_URL
+from lxml.cssselect import CSSSelector
 from urlparse import urljoin
+from .. import SITE_URL
 
 
 TALKS_LIST_URL = "http://www.ted.com/talks/quick-list"

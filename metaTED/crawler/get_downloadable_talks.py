@@ -1,9 +1,9 @@
-import logging
 from concurrent import futures
+import logging
 from multiprocessing import cpu_count
-from metaTED.cache import cached_storage
-from metaTED.crawler.get_talk_info import get_talk_info, ExternallyHostedDownloads, NoDownloadsFound
-from metaTED.crawler.get_talks_urls import get_talks_urls
+from .get_talk_info import get_talk_info, ExternallyHostedDownloads, NoDownloadsFound
+from .get_talks_urls import get_talks_urls
+from ..cache import cached_storage
 
 
 _PAGINATE_BY = 20
@@ -70,7 +70,7 @@ def get_downloadable_talks(num_workers=None):
         raise NoDownloadableTalksFound('No downloadable talks found')
     
     logging.info(
-        "Found %d downloadable talks in total",
+        "Found %d downloadable talk(s) in total",
         len(downloadable_talks)
     )
     return downloadable_talks

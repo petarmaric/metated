@@ -1,15 +1,11 @@
-import os
-import logging
+from email.utils import formatdate
 from jinja2 import Environment, PackageLoader
-from metaTED import __version__
-from metaTED.cache import cached_storage
-from metaTED.crawler.get_downloadable_talks import get_downloadable_talks
-from metaTED.crawler.get_talk_info import AVAILABLE_VIDEO_QUALITIES
-
-try:
-    from email.utils import formatdate
-except ImportError:
-    from email.Utils import formatdate # Python 2.4 fallback
+import logging
+import os
+from . import __version__
+from .cache import cached_storage
+from .crawler.get_downloadable_talks import get_downloadable_talks
+from .crawler.get_talk_info import AVAILABLE_VIDEO_QUALITIES
 
 
 _METALINK_BASE_URL = "http://metated.petarmaric.com/metalinks/%s"
@@ -31,18 +27,20 @@ def _get_downloads(downloadable_talks, quality, group_by=None):
             'download_url': quality_info['download_url'],
             'full_file_path': full_file_path
         })
+    
     return downloads
 
-
 def _get_metalink_file_name(quality, group_by):
-    group_part = group_by and "-grouped-by-%s" % group_by or ''
-    return "TED-talks%s-in-%s-quality.metalink" % (group_part, quality)
-
+    return "TED-talks%s-in-%s-quality.metalink" % (
+        "-grouped-by-%s" % group_by if group_by else '',
+        quality
+    )
 
 def _get_metalink_description(quality, group_by):
-    group_part = group_by and " grouped by %s" % group_by.replace('-', ' ') or ''
-    return "Download TED talks%s encoded in %s quality" % (group_part, quality)
-
+    return "Download TED talks%s encoded in %s quality" % (
+        " grouped by %s" % group_by.replace('-', ' ') if group_by else '',
+        quality
+    )
 
 def _get_group_downloads_by(downloadable_talks):
     # Also generate metalinks with no grouped downloads
@@ -57,7 +55,6 @@ def _get_group_downloads_by(downloadable_talks):
     logging.debug("Downloads can be grouped by '%s'", groups)
     return groups
 
-
 def generate_metalinks(output_dir=None):
     output_dir = os.path.abspath(output_dir or '')
     if not os.path.exists(output_dir):
@@ -69,7 +66,7 @@ def generate_metalinks(output_dir=None):
     # Prepare the template upfront, because it can be reused between metalinks
     env = Environment(loader=PackageLoader('metaTED'))
     template = env.get_template('template.metalink')
-
+    
     # Use the same dates/times for all metalinks because they should, in my
     # opinion, point out when the metalinks were being generated and not when
     # they were physically written do disk
@@ -102,6 +99,7 @@ def generate_metalinks(output_dir=None):
                 'description': metalink_description
             })
             logging.info("Generated '%s' metalink", metalink_file_name)
+    
     return {
         'metaTED_version': __version__,
         'first_published_on': first_published_on,
