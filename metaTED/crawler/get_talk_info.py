@@ -30,7 +30,9 @@ AVAILABLE_VIDEO_QUALITIES = {
     'standard': 'Regular',
     'high': 'High',
 }
-_QUALITIES_XPATH_FMT = "//a[@href='%s']/ancestor::node()[name()='tr']/td[5]/a"
+_VIDEO_QUALITIES_XPATH = XPath(
+    '//a[@href=$relative_talk_url]/ancestor::node()[name()="tr"]/td[5]/a'
+)
 
 
 class NoDownloadsFound(Exception):
@@ -104,8 +106,9 @@ def _get_download_urls_dict(talk_url):
     """
     return dict(
         (a.text.strip(), urljoin(SITE_URL, a.get('href')))
-        for a in _get_talk_list_document().xpath(
-            _QUALITIES_XPATH_FMT % urlsplit(talk_url).path
+        for a in _VIDEO_QUALITIES_XPATH(
+            _get_talk_list_document(),
+            relative_talk_url=urlsplit(talk_url).path
         )
     )
 
