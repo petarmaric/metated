@@ -1,18 +1,11 @@
-import re
 import logging
-from lxml.cssselect import CSSSelector
 from lxml import html
+from lxml.cssselect import CSSSelector
 from os.path import splitext
+import re
 from urlparse import urljoin, urlsplit
-from metaTED import SITE_URL
-from metaTED.crawler.get_talks_urls import TALKS_LIST_URL
-
-
-AVAILABLE_VIDEO_QUALITIES = {
-    'low': 'Low',
-    'standard': 'Regular',
-    'high': 'High',
-}
+from .get_talks_urls import TALKS_LIST_URL
+from .. import SITE_URL
 
 
 _HTML_ENTITY_RE = re.compile(r'&(#?[xX]?[0-9a-fA-F]+|\w{1,8});')
@@ -31,6 +24,11 @@ _AUTHOR_SELECTOR = CSSSelector('div#accordion div p strong')
 
 _THEME_SELECTOR = CSSSelector('ul.relatedThemes li a')
 
+AVAILABLE_VIDEO_QUALITIES = {
+    'low': 'Low',
+    'standard': 'Regular',
+    'high': 'High',
+}
 _QUALITIES_XPATH_FMT = "//a[@href='%s']/ancestor::node()[name()='tr']/td[5]/a"
 
 
@@ -53,7 +51,6 @@ def _clean_up_file_name(file_name, replace_first_colon_with_dash=False):
     # Should be clean now
     return file_name
 
-
 _talk_list_document_cache = None
 def _get_talk_list_document():
     global _talk_list_document_cache
@@ -62,7 +59,6 @@ def _get_talk_list_document():
         _talk_list_document_cache = html.parse(TALKS_LIST_URL)
     
     return _talk_list_document_cache
-
 
 def _guess_video_player_metadata(name, regexp, talk_url, document):
     elements = _VIDEO_PLAYER_SELECTOR(document)
@@ -74,7 +70,6 @@ def _guess_video_player_metadata(name, regexp, talk_url, document):
     logging.warning("Failed to guess the %s of '%s'", name, talk_url)
     return 'Unknown'
 
-
 def _guess_author(talk_url, document):
     """
     Tries to guess the author, or returns 'Unknown' if no author was found.
@@ -83,12 +78,8 @@ def _guess_author(talk_url, document):
     if elements:
         return _clean_up_file_name(elements[0].text)
     
-    logging.warning(
-        "Failed to guess the author of '%s'",
-        talk_url
-    )
+    logging.warning("Failed to guess the author of '%s'", talk_url)
     return 'Unknown'
-
 
 def _guess_theme(talk_url, document):
     """
@@ -98,12 +89,8 @@ def _guess_theme(talk_url, document):
     if elements:
         return _clean_up_file_name(elements[0].text)
     
-    logging.warning(
-        "Failed to guess the theme of '%s'",
-        talk_url
-    )
+    logging.warning("Failed to guess the theme of '%s'", talk_url)
     return 'Unknown'
-
 
 def _get_download_urls_dict(talk_url):
     """
@@ -117,12 +104,11 @@ def _get_download_urls_dict(talk_url):
         )
     )
 
-
 def get_talk_info(talk_url):
     document = html.parse(talk_url)
     file_base_name = _clean_up_file_name(
         document.find('/head/title').text.split('|')[0].strip(),
-        True
+        replace_first_colon_with_dash=True
     )
     
     # Downloads not hosted by TED!
@@ -149,11 +135,11 @@ def get_talk_info(talk_url):
                 talk_url
             )
             qualities_missing.append(name)
-
-    if len(qualities_found) == 0: # No downloads found!
+    
+    if not qualities_found: # No downloads found!
         raise NoDownloadsFound(talk_url)
-
-    if len(qualities_missing) > 0: # Some found, but not all
+    
+    if qualities_missing: # Some found, but not all
         # Use what you got, emulate the rest with the first discovered quality
         emulator_name = qualities_found[0]
         emulator = qualities[emulator_name]
