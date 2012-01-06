@@ -63,8 +63,7 @@ def get_downloadable_talks(num_workers=None):
                     talk_info = future.result()
                     downloadable_talks.append(talk_info)
                     talks_info[talk_url] = talk_info
-        
-        cached_storage['talks_infos'] = talks_info
+                    cached_storage['talks_infos'] = talks_info
     
     if not downloadable_talks:
         raise NoDownloadableTalksFound('No downloadable talks found')
