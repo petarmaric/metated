@@ -1,6 +1,7 @@
 import logging
 from lxml import html
 from lxml.cssselect import CSSSelector
+from lxml.etree import XPath
 from os.path import splitext
 import re
 from urlparse import urljoin, urlsplit
@@ -20,7 +21,7 @@ _VIDEO_PLAYER_METADATA = {
     'publishing-year': re.compile('pd:\"\w+ (\d+)\",'),
 }
 
-_AUTHOR_SELECTOR = CSSSelector('div#accordion div p strong')
+_AUTHOR_BIO_XPATH = XPath('//a[text()="Full bio and more links"]')
 
 _THEME_SELECTOR = CSSSelector('ul.relatedThemes li a')
 
@@ -74,9 +75,13 @@ def _guess_author(talk_url, document):
     """
     Tries to guess the author, or returns 'Unknown' if no author was found.
     """
-    elements = _AUTHOR_SELECTOR(document)
+    elements = _AUTHOR_BIO_XPATH(document)
     if elements:
-        return _clean_up_file_name(elements[0].text)
+        author_bio_url = urljoin(SITE_URL, elements[0].get('href'))
+        author_bio_document = html.parse(author_bio_url)
+        return _clean_up_file_name(
+            author_bio_document.find('/head/title').text.split('|')[0].strip()
+        )
     
     logging.warning("Failed to guess the author of '%s'", talk_url)
     return 'Unknown'
