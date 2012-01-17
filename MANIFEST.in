@@ -2,6 +2,7 @@ include AUTHORS
 include CHANGELOG
 include LICENSE
 include README
+include THANKS
 
 include MANIFEST.in
 include ez_setup.py
