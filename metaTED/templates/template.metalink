@@ -10,12 +10,14 @@
     <description>{{ description }}</description>
     <tags>TED, download, video</tags>
     <files>
-        {%- for talk in talks %}
-        <file name="{{ talk.full_file_path }}">
+        {%- for download in downloads %}
+            {%- for resource in download.values() %}
+        <file name="{{ resource.full_file_path }}">
             <resources>
-                <url type="http">{{ talk.download_url }}</url>
+                <url type="http">{{ resource.download_url }}</url>
             </resources>
         </file>
+            {%- endfor %}
         {%- endfor %}
     </files>
 </metalink>

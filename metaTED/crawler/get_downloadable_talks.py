@@ -16,14 +16,8 @@ class NoDownloadableTalksFound(Exception):
 def get_downloadable_talks(num_workers=None):
     talks_urls = get_talks_urls()
     
-    talks_info = cached_storage.get('talks_infos', {})
-    downloadable_talks = []
-    new_talks_urls = []
-    for talk_url in talks_urls:
-        if talk_url in talks_info:
-            downloadable_talks.append(talks_info[talk_url])
-        else:
-            new_talks_urls.append(talk_url)
+    downloadable_talks = cached_storage.get('talks_infos', {})
+    new_talks_urls = [url for url in talks_urls if url not in downloadable_talks]
     
     if not new_talks_urls:
         logging.info('No new talk urls found')
@@ -60,10 +54,8 @@ def get_downloadable_talks(num_workers=None):
                     else:
                         logging.error("Skipping '%s', reason: %s", talk_url, e)
                 else:
-                    talk_info = future.result()
-                    downloadable_talks.append(talk_info)
-                    talks_info[talk_url] = talk_info
-                    cached_storage['talks_infos'] = talks_info
+                    downloadable_talks[talk_url] = future.result()
+                    cached_storage['talks_infos'] = downloadable_talks
     
     if not downloadable_talks:
         raise NoDownloadableTalksFound('No downloadable talks found')

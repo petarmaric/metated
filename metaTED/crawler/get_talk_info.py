@@ -25,6 +25,8 @@ _AUTHOR_BIO_XPATH = XPath('//a[text()="Full bio and more links"]')
 
 _THEME_SELECTOR = CSSSelector('ul.relatedThemes li a')
 
+_TRANSCRIPT_LANGUAGES_SELECTOR = CSSSelector('div#transcript select option')
+
 AVAILABLE_VIDEO_QUALITIES = {
     'low': 'Low',
     'standard': 'Regular',
@@ -99,6 +101,20 @@ def _guess_theme(talk_url, document):
     logging.warning("Failed to guess the theme of '%s'", talk_url)
     return 'Unknown'
 
+def _get_subtitle_languages_codes(talk_url, document):
+    """
+    Returns a list of all subtitle language codes for a given talk URL. 
+    """
+    language_codes = [
+        opt.get('value')
+        for opt in _TRANSCRIPT_LANGUAGES_SELECTOR(document)
+    ]
+    
+    if not language_codes:
+        logging.warning("Failed to find any subtitles for '%s'", talk_url)
+    
+    return language_codes
+
 def _get_download_urls_dict(talk_url):
     """
     Returns a dictionary of all download URLs for a given talk URL, mapping 
@@ -163,6 +179,7 @@ def get_talk_info(talk_url):
     talk_info = {
         'author': _guess_author(talk_url, document),
         'theme': _guess_theme(talk_url, document),
+        'language-codes': _get_subtitle_languages_codes(talk_url, document),
         'qualities': qualities,
     }
     talk_info.update(
