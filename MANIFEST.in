@@ -5,7 +5,7 @@ include README
 include THANKS
 
 include MANIFEST.in
-include ez_setup.py
+include distribute_setup.py
 include requirements.txt
 
 recursive-include metaTED/templates *
