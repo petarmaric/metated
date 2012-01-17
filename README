@@ -1,10 +1,15 @@
 metaTED is a tool that makes it easy to download all of the `TED talks`_. It
-does so by creating over 8 `metalinks`_ of TED talks varying in both the
+does so by creating over 1,500 `metalinks`_ of TED talks varying in both the
 quality levels and possible talk groupings by directory. Features include:
 
     * Creates talks with informative file names - i.e.
       ``Unconventional Explanations/Hans Rosling on HIV - New facts and stunning data visuals.mp4``
       instead of original ``HansRosling_2009_480.mp4``.
+
+    * Provides subtitles for talks in over 85 supported languages. New
+      languages and translations are added daily through the
+      `TED Open Translation Project`_, and you help out by
+      `becoming a translator today`_.
 
     * Tries hard to get all of the talks, or at least most of them - with a good
       reason if some have failed.
@@ -15,7 +20,7 @@ quality levels and possible talk groupings by directory. Features include:
     * More choice - creates one metalink per available talk grouping, with all
       talks belonging to the same group placed inside a common directory. The
       possible talk groupings are extracted from talks metadata (currently
-      filming/publishing year, talk theme and author).
+      filming year, publishing year, talk theme, event name and author).
 
     * Aggressive caching throughout the project, to avoid expensive network/CPU
       operations as much as possible. Proper cache invalidation included.
@@ -28,8 +33,10 @@ quality levels and possible talk groupings by directory. Features include:
 
     * Provides both the console script and a public API.
 
+.. _becoming a translator today: http://www.ted.com/translate/forted
 .. _metalinks: http://en.wikipedia.org/wiki/Metalink
 .. _TED talks: http://www.ted.com/
+.. _TED Open Translation Project: http://www.ted.com/pages/view/id/287
 
 Downloading TED talks
 =====================
@@ -47,19 +54,71 @@ package, or even Python. All you need to do is get a
 Installing and running metaTED
 ==============================
 
-metaTED is available as an `easy-install`_-able package, you can install it with
-``easy_install -U metaTED``, or ``pip install metaTED`` if you have `pip`_. You
-can run it with ``metaTED``, or ``metaTED -h`` to get help and the list of all
-available options.
+You can install metaTED with `pip`_ via ``pip install metaTED``. You can run it
+with ``metaTED``, or ``metaTED -h`` to get help and the list of all available
+options.
 
 The project itself is `hosted on bitbucket`_, from where you can get the code
 and report bugs.
 
-.. _easy-install: http://peak.telecommunity.com/DevCenter/EasyInstall
 .. _pip: http://pip.openplans.org/
 .. _hosted on bitbucket: http://bitbucket.org/petar/metated/
 
-New in metaTED 1.0.9
+New in metaTED 2.0.0
 ====================
 
-    * Simplified code for finding talk URLs.
+metaTED 2.0.0 has been in the works for some time. It's the bigest change yet in
+the projects short lived 2.5 year history. Cool stuff has been added, bugs were
+fixed, but the API has seen some backwards incompatible changes as well.
+
+Feature additions
+-----------------
+
+    * Fixed `issue #4`_ - Added talk subtitles support, as per popular request.
+      Major thanks to Randall Mason for the initial implementation.
+
+    * Added parallelism to the crawler, leading to substantial performance
+      improvements.
+
+    * Added filming year, publishing year and event name to talks metadata,
+      which automagically added new possible talk groupings.
+
+    * Added parallelism to the metalink generator, leading to substantial
+      performance improvements.
+
+.. _issue #4: https://bitbucket.org/petar/metated/issue/4/include-subtitles
+
+Bugfixes
+--------
+
+    * Updated talk theme markers as TED updated their HTML layout and improved
+      error handling.
+
+    * Updated video download markers and download URLs detection code as TED
+      updated their HTML layout.
+
+    * Updated author markers and detection code as TED updated their HTML
+      layout.
+
+    * talk_info metadata cache is written to disk as soon as possible to
+      minimize data loss on errors.
+
+    * Removed `setup.cfg` as we no longer need it.
+
+    * Removed the `dreamy-trac` project reference from `LICENSE`.
+
+Internals
+---------
+
+    * Switched from using `setuptools` to `distribute` for packaging.
+
+    * Removed crawler based page caching as it's no longer used nor needed.
+
+    * Switched from `BeautifulSoup` to `lxml` and removed custom crawler code in
+      favor of `lxml.html.parse`.
+
+    * Minimal Python version bumped from 2.4+ to 2.6+.
+
+    * Major refactoring to modernize existing codebase, while improving code
+      style, optimizing performance and getting rid of accumulated technical
+      debt. Existing API has suffered a bit.
