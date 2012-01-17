@@ -69,6 +69,8 @@ def _get_group_downloads_by(downloadable_talks):
     groups.remove('qualities') # Can't group by qualities metadata
     groups.remove('language-codes') # Can't group by subtitle languages metadata
     
+    groups.sort()
+    
     logging.debug("Downloads can be grouped by '%s'", groups)
     return groups
 
