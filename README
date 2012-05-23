@@ -64,61 +64,13 @@ and report bugs.
 .. _pip: http://pip.openplans.org/
 .. _hosted on bitbucket: http://bitbucket.org/petar/metated/
 
-New in metaTED 2.0.0
+New in metaTED 2.0.1
 ====================
-
-metaTED 2.0.0 has been in the works for some time. It's the bigest change yet in
-the projects short lived 2.5 year history. Cool stuff has been added, bugs were
-fixed, but the API has seen some backwards incompatible changes as well.
-
-Feature additions
------------------
-
-    * Fixed `issue #4`_ - Added talk subtitles support, as per popular request.
-      Major thanks to Randall Mason for the initial implementation.
-
-    * Added parallelism to the crawler, leading to substantial performance
-      improvements.
-
-    * Added filming year, publishing year and event name to talks metadata,
-      which automagically added new possible talk groupings.
-
-    * Added parallelism to the metalink generator, leading to substantial
-      performance improvements.
-
-.. _issue #4: https://bitbucket.org/petar/metated/issue/4/include-subtitles
 
 Bugfixes
 --------
 
-    * Updated talk theme markers as TED updated their HTML layout and improved
-      error handling.
+    * Blacklisted another talk URL with no downloads.
 
-    * Updated video download markers and download URLs detection code as TED
-      updated their HTML layout.
-
-    * Updated author markers and detection code as TED updated their HTML
+    * Updated author and video metadata markers as TED updated their HTML
       layout.
-
-    * talk_info metadata cache is written to disk as soon as possible to
-      minimize data loss on errors.
-
-    * Removed `setup.cfg` as we no longer need it.
-
-    * Removed the `dreamy-trac` project reference from `LICENSE`.
-
-Internals
----------
-
-    * Switched from using `setuptools` to `distribute` for packaging.
-
-    * Removed crawler based page caching as it's no longer used nor needed.
-
-    * Switched from `BeautifulSoup` to `lxml` and removed custom crawler code in
-      favor of `lxml.html.parse`.
-
-    * Minimal Python version bumped from 2.4+ to 2.6+.
-
-    * Major refactoring to modernize existing codebase, while improving code
-      style, optimizing performance and getting rid of accumulated technical
-      debt. Existing API has suffered a bit.

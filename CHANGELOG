@@ -1,3 +1,14 @@
+metaTED 2.0.1 (May 23, 2012)
+===============================
+
+Bugfixes
+--------
+
+    * Blacklisted another talk URL with no downloads.
+
+    * Updated author and video metadata markers as TED updated their HTML
+      layout.
+
 metaTED 2.0.0 (January 17, 2012)
 ================================
 
