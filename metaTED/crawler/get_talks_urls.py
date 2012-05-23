@@ -13,6 +13,7 @@ TALKS_URLS_BLACKLIST = [
     # No downloads
     'http://www.ted.com/talks/rokia_traore_sings_m_bifo.html',
     'http://www.ted.com/talks/rokia_traore_sings_kounandi.html',
+    'http://www.ted.com/talks/andrew_stanton_the_clues_to_a_great_story.html',
 ]
 
 
