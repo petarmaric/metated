@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 from lxml import html
 from lxml.cssselect import CSSSelector
@@ -14,14 +15,14 @@ _INVALID_FILE_NAME_CHARS_RE = re.compile('[^\w\.\- ]+')
 
 _EXTERNALLY_HOSTED_DOWNLOADS_SELECTOR = CSSSelector('div#external_player')
 
-_VIDEO_PLAYER_SELECTOR = CSSSelector('div#videoPlayerSWF + script')
+_VIDEO_PLAYER_SELECTOR = CSSSelector('body script:last-child')
 _VIDEO_PLAYER_METADATA = {
     'event': re.compile('en:\"(.+)\",'),
     'filming-year': re.compile('fd:\"\w+ (\d+)\",'),
     'publishing-year': re.compile('pd:\"\w+ (\d+)\",'),
 }
 
-_AUTHOR_BIO_XPATH = XPath('//a[text()="Full bio and more links"]')
+_AUTHOR_BIO_XPATH = XPath(u'//a[text()="Full bio »"]')
 
 _THEME_SELECTOR = CSSSelector('ul.relatedThemes li a')
 
