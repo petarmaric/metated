@@ -1,3 +1,12 @@
+metaTED 2.0.2 (July 23, 2012)
+=============================
+
+Bugfixes
+--------
+
+    * Updated filming year, publishing year, event name markers and the
+      detection code as TED updated their HTML layout.
+
 metaTED 2.0.1 (May 23, 2012)
 ===============================
 
