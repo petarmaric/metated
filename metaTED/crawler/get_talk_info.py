@@ -15,18 +15,13 @@ _INVALID_FILE_NAME_CHARS_RE = re.compile('[^\w\.\- ]+')
 
 _EXTERNALLY_HOSTED_DOWNLOADS_SELECTOR = CSSSelector('div#external_player')
 
-_VIDEO_PLAYER_SELECTOR = CSSSelector('body script:last-child')
-_VIDEO_PLAYER_METADATA = {
-    'event': re.compile('en:\"(.+)\",'),
-    'filming-year': re.compile('fd:\"\w+ (\d+)\",'),
-    'publishing-year': re.compile('pd:\"\w+ (\d+)\",'),
-}
-
 _AUTHOR_BIO_XPATH = XPath(u'//a[text()="Full bio »"]')
+
+_EVENT_SELECTOR = CSSSelector('div.talk-meta span.event-name')
 
 _THEME_SELECTOR = CSSSelector('ul.relatedThemes li a')
 
-_TRANSCRIPT_LANGUAGES_SELECTOR = CSSSelector('div#transcript select option')
+_TRANSCRIPT_LANGUAGES_SELECTOR = CSSSelector('select#languageCode option')
 
 AVAILABLE_VIDEO_QUALITIES = {
     'low': 'Low',
@@ -36,6 +31,12 @@ AVAILABLE_VIDEO_QUALITIES = {
 _VIDEO_QUALITIES_XPATH = XPath(
     '//a[@href=$relative_talk_url]/ancestor::node()[name()="tr"]/td[5]/a'
 )
+
+_YEARS_SELECTOR = CSSSelector('div.talk-meta')
+_YEARS_RE_DICT = {
+    'filming-year': re.compile('Filmed \w+ (\d+)'),
+    'publishing-year': re.compile('Posted \w+ (\d+)'),
+}
 
 
 class NoDownloadsFound(Exception):
@@ -66,16 +67,6 @@ def _get_talk_list_document():
     
     return _talk_list_document_cache
 
-def _guess_video_player_metadata(name, regexp, talk_url, document):
-    elements = _VIDEO_PLAYER_SELECTOR(document)
-    if elements:
-        match = regexp.search(elements[0].text)
-        if match:
-            return _clean_up_file_name(match.group(1))
-    
-    logging.warning("Failed to guess the %s of '%s'", name, talk_url)
-    return 'Unknown'
-
 def _guess_author(talk_url, document):
     """
     Tries to guess the author, or returns 'Unknown' if no author was found.
@@ -89,6 +80,17 @@ def _guess_author(talk_url, document):
         )
     
     logging.warning("Failed to guess the author of '%s'", talk_url)
+    return 'Unknown'
+
+def _guess_event(talk_url, document):
+    """
+    Tries to guess the talks event, or returns 'Unknown' if no event was found.
+    """
+    elements = _EVENT_SELECTOR(document)
+    if elements:
+        return _clean_up_file_name(elements[0].text)
+    
+    logging.warning("Failed to guess the event of '%s'", talk_url)
     return 'Unknown'
 
 def _guess_theme(talk_url, document):
@@ -109,6 +111,7 @@ def _get_subtitle_languages_codes(talk_url, document):
     language_codes = [
         opt.get('value')
         for opt in _TRANSCRIPT_LANGUAGES_SELECTOR(document)
+        if opt.get('value') != ''
     ]
     
     if not language_codes:
@@ -128,6 +131,16 @@ def _get_download_urls_dict(talk_url):
             relative_talk_url=urlsplit(talk_url).path
         )
     )
+
+def _guess_year(name, regexp, talk_url, document):
+    elements = _YEARS_SELECTOR(document)
+    if elements:
+        match = regexp.search(elements[0].text_content())
+        if match:
+            return _clean_up_file_name(match.group(1))
+    
+    logging.warning("Failed to guess the %s of '%s'", name, talk_url)
+    return 'Unknown'
 
 def get_talk_info(talk_url):
     document = html.parse(talk_url)
@@ -184,7 +197,7 @@ def get_talk_info(talk_url):
         'qualities': qualities,
     }
     talk_info.update(
-        (name, _guess_video_player_metadata(name, regexp, talk_url, document))
-        for name, regexp in _VIDEO_PLAYER_METADATA.items()
+        (name, _guess_year(name, regexp, talk_url, document))
+        for name, regexp in _YEARS_RE_DICT.items()
     )
     return talk_info
