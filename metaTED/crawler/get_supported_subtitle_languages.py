@@ -5,8 +5,12 @@ import re
 
 
 LANGUAGES_LIST_URL = 'http://www.ted.com/translate/languages'
-_LANGUAGES_SELECTOR = CSSSelector('div#maincontent div ul li a')
+_LANGUAGES_SELECTOR = CSSSelector('div#content div div ul li a')
 _LANGUAGE_CODE_RE = re.compile('/translate/languages/([\w\-]+)')
+
+
+class NoSupportedSubtitleLanguagesFound(Exception):
+    pass
 
 
 def get_supported_subtitle_languages():
@@ -21,6 +25,9 @@ def get_supported_subtitle_languages():
             languages[match.group(1)] = language_name
         else:
             logging.warning("'%s' doesn't seem to be a language", language_name)
+    
+    if not languages:
+        raise NoSupportedSubtitleLanguagesFound('No supported subtitle languages found')
     
     logging.info("Found %d supported subtitle language(s)", len(languages))
     logging.debug("Supported subtitle languages are: %s", languages)
