@@ -64,11 +64,12 @@ and report bugs.
 .. _pip: http://pip.openplans.org/
 .. _hosted on bitbucket: http://bitbucket.org/petar/metated/
 
-New in metaTED 2.0.2
+New in metaTED 2.0.3
 ====================
 
 Bugfixes
 --------
 
-    * Updated filming year, publishing year, event name markers and the
-      detection code as TED updated their HTML layout.
+    * Updated supported subtitle language markers as TED updated their HTML
+      layout, improved error handling.
+      Thanks to Sam Tygier for the bug report.

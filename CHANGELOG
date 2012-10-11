@@ -1,3 +1,13 @@
+metaTED 2.0.3 (October 11, 2012)
+=============================
+
+Bugfixes
+--------
+
+    * Updated supported subtitle language markers as TED updated their HTML
+      layout, improved error handling.
+      Thanks to Sam Tygier for the bug report.
+
 metaTED 2.0.2 (July 23, 2012)
 =============================
 
