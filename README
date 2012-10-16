@@ -64,12 +64,12 @@ and report bugs.
 .. _pip: http://pip.openplans.org/
 .. _hosted on bitbucket: http://bitbucket.org/petar/metated/
 
-New in metaTED 2.0.3
+New in metaTED 2.0.4
 ====================
 
 Bugfixes
 --------
 
-    * Updated supported subtitle language markers as TED updated their HTML
-      layout, improved error handling.
-      Thanks to Sam Tygier for the bug report.
+    * Fixed issue #12 - Updated video file extension detection code as TED
+      changed their video download URLs.
+      Thanks to J. D. Stevens and Sam Tygier for the bug report.
