@@ -164,7 +164,10 @@ def get_talk_info(talk_url):
             qualities_found.append(name)
             qualities[name] = {
                 'download_url': download_url,
-                'file_name': "%s%s" % (file_base_name, splitext(download_url)[1])
+                'file_name': "%s%s" % (
+                    file_base_name,
+                    splitext(urlsplit(download_url).path)[1]
+                )
             }
         else:
             logging.error(
