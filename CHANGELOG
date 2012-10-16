@@ -1,3 +1,13 @@
+metaTED 2.0.4 (October 16, 2012)
+=============================
+
+Bugfixes
+--------
+
+    * Fixed issue #12 - Updated video file extension detection code as TED
+      changed their video download URLs.
+      Thanks to J. D. Stevens and Sam Tygier for the bug report.
+
 metaTED 2.0.3 (October 11, 2012)
 =============================
 
