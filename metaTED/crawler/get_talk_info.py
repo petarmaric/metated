@@ -15,7 +15,7 @@ _INVALID_FILE_NAME_CHARS_RE = re.compile('[^\w\.\- ]+')
 
 _EXTERNALLY_HOSTED_DOWNLOADS_SELECTOR = CSSSelector('div#external_player')
 
-_AUTHOR_BIO_XPATH = XPath(u'//a[text()="Full bio »"]')
+_AUTHOR_BIO_XPATH = XPath(u'//a[contains(text(), "Full bio")]')
 
 _EVENT_SELECTOR = CSSSelector('div.talk-meta span.event-name')
 
