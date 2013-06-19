@@ -11,44 +11,11 @@ from .crawler.get_talk_info import AVAILABLE_VIDEO_QUALITIES
 
 
 _METALINK_BASE_URL = "http://metated.petarmaric.com/metalinks/%s"
-_SUBTITLE_URL_FMT = "http://tedsubtitles.appspot.com/getsubtitles?langcode=%s&amp;tedurl=%s"
 
-
-def _get_downloads(downloadable_talks, language_code, quality, group_by):
-    downloads = []
-    for talk_url, talk_info in downloadable_talks.iteritems():
-        quality_info = talk_info['qualities'][quality]
-        
-        # Calculate full talk file path
-        talk_file_path = quality_info['file_name']
-        if group_by:
-            talk_file_path = "%s/%s" % (talk_info[group_by], talk_file_path)
-        
-        download_info = dict(talk={
-            'download_url': quality_info['download_url'],
-            'full_file_path': talk_file_path,
-        })
-        
-        # Check if there's a subtitle for this talk and language
-        if language_code in talk_info['language-codes']:
-            download_info['subtitle'] = {
-                'download_url': _SUBTITLE_URL_FMT % (
-                    language_code,
-                    talk_url,
-                ),
-                'full_file_path': "%s.%s.srt" % (
-                    os.path.splitext(talk_file_path)[0],
-                    language_code,
-                ),
-            }
-        
-        downloads.append(download_info)
-    
-    return downloads
 
 def _get_metalink_file_name(language_code, quality, group_by):
     return "TED-talks%s-in-%s-quality.%s.metalink" % (
-        "-grouped-by-%s" % group_by if group_by else '',
+        "-grouped-by-%s" % group_by.replace('_', '-') if group_by else '',
         quality,
         language_code
     )
@@ -56,7 +23,7 @@ def _get_metalink_file_name(language_code, quality, group_by):
 def _get_metalink_description(language_name, quality, group_by):
     return "Download TED talks with %s subtitles%s encoded in %s quality" % (
         language_name,
-        " grouped by %s" % group_by.replace('-', ' ') if group_by else '',
+        " grouped by %s" % group_by.replace('_', ' ') if group_by else '',
         quality
     )
 
@@ -64,10 +31,11 @@ def _get_group_downloads_by(downloadable_talks):
     groups = [None] # Also generate metalinks with no grouped downloads
     
     # Extract talk_info metadata and guess possible groupings from it
-    groups.extend(downloadable_talks.itervalues().next().keys())
+    groups.extend(downloadable_talks[0].keys())
     
-    groups.remove('qualities') # Can't group by qualities metadata
-    groups.remove('language-codes') # Can't group by subtitle languages metadata
+    groups.remove('language_codes') # Can't group by subtitle languages metadata
+    groups.remove('media_slug') # Can't group by media slug metadata
+    groups.remove('file_base_name') # Can't group by file name
     
     groups.sort()
     
@@ -102,9 +70,10 @@ def _generate_metalink(args):
         'first_published_on': c['first_published_on'],
         'refresh_date': c['refresh_date'],
         'description': metalink_description,
-        'downloads': _get_downloads(
-            c['downloadable_talks'], language_code, quality, group_by
-        ),
+        'downloadable_talks': c['downloadable_talks'],
+        'language_code': language_code,
+        'group_by': group_by,
+        'quality_slug': AVAILABLE_VIDEO_QUALITIES[quality],
     }).dump(
         os.path.join(c['output_dir'], metalink_file_name),
         encoding='utf-8'
@@ -123,7 +92,7 @@ def generate_metalinks(output_dir=None):
         os.makedirs(output_dir)
     
     # Make sure downloadable_talks can be calculated
-    downloadable_talks = get_downloadable_talks()
+    downloadable_talks = get_downloadable_talks().values()
     
     # Use the same dates/times for all metalinks because they should, in my
     # opinion, point out when the metalinks were being generated and not when

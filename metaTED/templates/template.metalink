@@ -10,14 +10,12 @@
     <description>{{ description }}</description>
     <tags>TED, download, video</tags>
     <files>
-        {%- for download in downloads %}
-            {%- for resource in download.values() %}
-        <file name="{{ resource.full_file_path }}">
+        {%- for talk in downloadable_talks %}
+        <file name="{% if group_by %}{{ talk[group_by] }}/{% endif %}{{ talk.file_base_name }}.mp4">
             <resources>
-                <url type="http">{{ resource.download_url }}</url>
+                <url type="http">http://download.ted.com/talks/{{ talk.media_slug }}{{ quality_slug }}{% if language_code in talk.language_codes %}-{{ language_code }}{% endif %}.mp4?apikey=TEDDOWNLOAD</url>
             </resources>
         </file>
-            {%- endfor %}
         {%- endfor %}
     </files>
 </metalink>
