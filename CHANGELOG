@@ -1,3 +1,26 @@
+metaTED 2.1.0 (June 19, 2013)
+=============================
+
+Feature additions
+-----------------
+
+    * Fixed #13, #14: Switched to hard subtitled video download URLs, as there
+      have been issues with externally hosted soft subtitles. The 'standard'
+      quality level has unfortunately been removed, as TED doesn't provide hard
+      subtitles for it.
+
+    * Removed `theme` from `talk_info` metadata as TED stopped providing theme
+      information in their HTML.
+
+Bugfixes
+--------
+
+    * Updated author marker as TED updated their HTML layout.
+
+    * Fixed #15: Updated code for finding talk urls as TED added pagination to
+      their talk list page. Reintroduced `talks_urls` caching to improve
+      performance.
+
 metaTED 2.0.4 (October 16, 2012)
 =============================
 

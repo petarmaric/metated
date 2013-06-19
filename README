@@ -1,5 +1,5 @@
 metaTED is a tool that makes it easy to download all of the `TED talks`_. It
-does so by creating over 1,500 `metalinks`_ of TED talks varying in both the
+does so by creating over 1,000 `metalinks`_ of TED talks varying in both the
 quality levels and possible talk groupings by directory. Features include:
 
     * Creates talks with informative file names - i.e.
@@ -20,7 +20,7 @@ quality levels and possible talk groupings by directory. Features include:
     * More choice - creates one metalink per available talk grouping, with all
       talks belonging to the same group placed inside a common directory. The
       possible talk groupings are extracted from talks metadata (currently
-      filming year, publishing year, talk theme, event name and author).
+      filming year, publishing year, event name and author).
 
     * Aggressive caching throughout the project, to avoid expensive network/CPU
       operations as much as possible. Proper cache invalidation included.
@@ -64,12 +64,25 @@ and report bugs.
 .. _pip: http://pip.openplans.org/
 .. _hosted on bitbucket: http://bitbucket.org/petar/metated/
 
-New in metaTED 2.0.4
+New in metaTED 2.1.0
 ====================
+
+Feature additions
+-----------------
+
+    * Fixed #13, #14: Switched to hard subtitled video download URLs, as there
+      have been issues with externally hosted soft subtitles. The 'standard'
+      quality level has unfortunately been removed, as TED doesn't provide hard
+      subtitles for it.
+
+    * Removed `theme` from `talk_info` metadata as TED stopped providing theme
+      information in their HTML.
 
 Bugfixes
 --------
 
-    * Fixed issue #12 - Updated video file extension detection code as TED
-      changed their video download URLs.
-      Thanks to J. D. Stevens and Sam Tygier for the bug report.
+    * Updated author marker as TED updated their HTML layout.
+
+    * Fixed #15: Updated code for finding talk urls as TED added pagination to
+      their talk list page. Reintroduced `talks_urls` caching to improve
+      performance.
