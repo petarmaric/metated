@@ -19,8 +19,6 @@ _AUTHOR_BIO_XPATH = XPath(u'//a[contains(text(), "Full bio")]')
 
 _EVENT_SELECTOR = CSSSelector('div.talk-meta span.event-name')
 
-_THEME_SELECTOR = CSSSelector('ul.relatedThemes li a')
-
 _TRANSCRIPT_LANGUAGES_SELECTOR = CSSSelector('select#languageCode option')
 
 AVAILABLE_VIDEO_QUALITIES = {
@@ -91,17 +89,6 @@ def _guess_event(talk_url, document):
         return _clean_up_file_name(elements[0].text)
     
     logging.warning("Failed to guess the event of '%s'", talk_url)
-    return 'Unknown'
-
-def _guess_theme(talk_url, document):
-    """
-    Tries to guess the talks theme, or returns 'Unknown' if no theme was found.
-    """
-    elements = _THEME_SELECTOR(document)
-    if elements:
-        return _clean_up_file_name(elements[0].text)
-    
-    logging.warning("Failed to guess the theme of '%s'", talk_url)
     return 'Unknown'
 
 def _get_subtitle_languages_codes(talk_url, document):
@@ -195,7 +182,6 @@ def get_talk_info(talk_url):
     
     talk_info = {
         'author': _guess_author(talk_url, document),
-        'theme': _guess_theme(talk_url, document),
         'language-codes': _get_subtitle_languages_codes(talk_url, document),
         'qualities': qualities,
     }
