@@ -7,7 +7,7 @@ from . import __version__
 from .cache import cached_storage
 from .crawler.get_downloadable_talks import get_downloadable_talks
 from .crawler.get_supported_subtitle_languages import get_supported_subtitle_languages
-from .crawler.get_talk_info import AVAILABLE_VIDEO_QUALITIES
+from .crawler.get_talk_info import AVAILABLE_VIDEO_QUALITIES, GROUP_DOWNLOADS_BY
 
 
 _METALINK_BASE_URL = "http://metated.petarmaric.com/metalinks/%s"
@@ -27,16 +27,9 @@ def _get_metalink_description(language_name, quality, group_by):
         quality
     )
 
-def _get_group_downloads_by(downloadable_talks):
+def _get_group_downloads_by():
     groups = [None] # Also generate metalinks with no grouped downloads
-    
-    # Extract talk_info metadata and guess possible groupings from it
-    groups.extend(downloadable_talks[0].keys())
-    
-    groups.remove('language_codes') # Can't group by subtitle languages metadata
-    groups.remove('media_slug') # Can't group by media slug metadata
-    groups.remove('file_base_name') # Can't group by file name
-    
+    groups.extend(GROUP_DOWNLOADS_BY)
     groups.sort()
     
     logging.debug("Downloads can be grouped by '%s'", groups)
@@ -73,7 +66,7 @@ def _generate_metalink(args):
         'downloadable_talks': c['downloadable_talks'],
         'language_code': language_code,
         'group_by': group_by,
-        'quality_slug': AVAILABLE_VIDEO_QUALITIES[quality],
+        'quality': quality,
     }).dump(
         os.path.join(c['output_dir'], metalink_file_name),
         encoding='utf-8'
@@ -103,12 +96,12 @@ def generate_metalinks(output_dir=None):
         cached_storage['first_published_on'] = first_published_on = refresh_date
     
     # Generate all metalink variants
-    group_by_list = _get_group_downloads_by(downloadable_talks)
+    group_by_list = _get_group_downloads_by()
     variants = [
         (language_code, language_name, group_by, quality)
         for language_code, language_name in get_supported_subtitle_languages().items()
             for group_by in group_by_list
-                for quality in AVAILABLE_VIDEO_QUALITIES.keys()
+                for quality in AVAILABLE_VIDEO_QUALITIES
     ]
     metalinks = Pool(
         initializer=_init_metalink_worker_immutable_data_cache,

@@ -13,7 +13,11 @@
         {%- for talk in downloadable_talks %}
         <file name="{% if group_by %}{{ talk[group_by] }}/{% endif %}{{ talk.file_base_name }}.mp4">
             <resources>
-                <url type="http">http://download.ted.com/talks/{{ talk.media_slug }}{{ quality_slug }}{% if language_code in talk.language_codes %}-{{ language_code }}{% endif %}.mp4?apikey=TEDDOWNLOAD</url>
+                {%- if language_code in talk['subtitled_downloads'] %}
+                <url type="http">{{ talk['subtitled_downloads'][language_code][quality] }}</url>
+                {%- else %}
+                <url type="http">{{ talk['native_downloads'][quality] }}</url>
+                {%- endif %}
             </resources>
         </file>
         {%- endfor %}
