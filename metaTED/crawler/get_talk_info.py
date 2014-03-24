@@ -1,38 +1,31 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
 from lxml import html
 from lxml.cssselect import CSSSelector
-from lxml.etree import XPath
 import re
-from urlparse import urljoin
-from .. import SITE_URL
+import time
 
 
 _HTML_ENTITY_RE = re.compile(r'&(#?[xX]?[0-9a-fA-F]+|\w{1,8});')
 _INVALID_FILE_NAME_CHARS_RE = re.compile('[^\w\.\- ]+')
 
-_EXTERNALLY_HOSTED_DOWNLOADS_SELECTOR = CSSSelector('div#external_player')
-
-_AUTHOR_BIO_XPATH = XPath(u'//a[contains(text(), "Full bio")]')
-
-_EVENT_SELECTOR = CSSSelector('div.talk-meta span.event-name')
-
-_TRANSCRIPT_LANGUAGES_SELECTOR = CSSSelector('select#languageCode option')
-
-_VIDEO_PLAYER_INFO_SELECTOR = CSSSelector('div#maincontent > div.leftColumn > script')
-_MEDIA_SLUG_RE = re.compile('"mediaSlug":"(\w+)"')
-
-AVAILABLE_VIDEO_QUALITIES = {
-    'low': '-low',
-    'high': '-480p',
+_VIDEO_PLAYER_DATA_SELECTOR = CSSSelector('div#talk + script')
+_VIDEO_PLAYER_DATA_JSON_RE = re.compile('q\("talkPage.init",(.+)\)')
+_VIDEO_PLAYER_DATA_TO_TALK_INFO = {
+    'speaker': 'author',
+    'event': 'event',
+    'filmed': 'filming_year',
+    'published': 'publishing_year',
+    
+    'name': 'file_base_name',
+    
+    'nativeDownloads': 'native_downloads',
+    'subtitledDownloads': 'subtitled_downloads',
 }
+GROUP_DOWNLOADS_BY = ('author', 'event', 'filming_year', 'publishing_year')
 
-_YEARS_SELECTOR = CSSSelector('div.talk-meta')
-_YEARS_RE_DICT = {
-    'filming_year': re.compile('Filmed \w+ (\d+)'),
-    'publishing_year': re.compile('Posted \w+ (\d+)'),
-}
-
+AVAILABLE_VIDEO_QUALITIES = ('low', 'high')
 
 class NoDownloadsFound(Exception):
     pass
@@ -53,88 +46,53 @@ def _clean_up_file_name(file_name, replace_first_colon_with_dash=False):
     # Should be clean now
     return file_name
 
-def _guess_author(talk_url, document):
+def get_talk_info(talk_url):
     """
-    Tries to guess the author, or returns 'Unknown' if no author was found.
+    Parses video player data to extract talk info. Sets 'Unknown' for unparsable
+    data.
     """
-    elements = _AUTHOR_BIO_XPATH(document)
+    document = html.parse(talk_url)
+    talk_info = dict.fromkeys(_VIDEO_PLAYER_DATA_TO_TALK_INFO.values(), 'Unknown')
+    
+    elements = _VIDEO_PLAYER_DATA_SELECTOR(document)
     if elements:
-        author_bio_url = urljoin(SITE_URL, elements[0].get('href'))
-        author_bio_document = html.parse(author_bio_url)
-        return _clean_up_file_name(
-            author_bio_document.find('/head/title').text.split('|')[0].strip()
-        )
+        match = _VIDEO_PLAYER_DATA_JSON_RE.match(elements[0].text)
+        if match:
+            video_player_data = json.loads(match.group(1))
+            data = video_player_data['talks'][0]
+            
+            if data['external']: # Downloads not hosted by TED!
+                raise ExternallyHostedDownloads(talk_url)
+            
+            for data_key, talk_info_key in _VIDEO_PLAYER_DATA_TO_TALK_INFO.items():
+                if data_key in data:
+                    x = data[data_key]
+                    
+                    if isinstance(x, (str, unicode)):
+                        # Any string-like parsed data should be cleaned up, as
+                        # it may later used for a piece of file name.
+                        # Also, when extracting `file_base_name` replace the 1st
+                        # colon with ' - ' to prettify the file name.
+                        x = _clean_up_file_name(
+                            x,
+                            replace_first_colon_with_dash=(talk_info_key=='file_base_name')
+                        )
+                    elif data_key in ('filmed', 'published'):
+                        # Extract year from Unix timestamp
+                        x = time.gmtime(x).tm_year
+                    
+                    talk_info[talk_info_key] = x
     
-    logging.warning("Failed to guess the author of '%s'", talk_url)
-    return 'Unknown'
-
-def _guess_event(talk_url, document):
-    """
-    Tries to guess the talks event, or returns 'Unknown' if no event was found.
-    """
-    elements = _EVENT_SELECTOR(document)
-    if elements:
-        return _clean_up_file_name(elements[0].text)
+    for k in _VIDEO_PLAYER_DATA_TO_TALK_INFO.values():
+        if talk_info[k] == 'Unknown':
+            logging.warning("Failed to guess the %s of '%s'", k, talk_url)
     
-    logging.warning("Failed to guess the event of '%s'", talk_url)
-    return 'Unknown'
-
-def _get_subtitle_languages_codes(talk_url, document):
-    """
-    Returns a list of all subtitle language codes for a given talk URL. 
-    """
-    language_codes = [
-        opt.get('value')
-        for opt in _TRANSCRIPT_LANGUAGES_SELECTOR(document)
-        if opt.get('value') != ''
-    ]
+    if not talk_info['native_downloads']:
+        
+        raise NoDownloadsFound(talk_url)
     
-    if not language_codes:
+    if not talk_info['subtitled_downloads']:
+        talk_info['subtitled_downloads'] = {} # JSON may return `None`, thus normalize it
         logging.warning("Failed to find any subtitles for '%s'", talk_url)
     
-    return language_codes
-
-def _get_media_slug(talk_url, document):
-    elements = _VIDEO_PLAYER_INFO_SELECTOR(document)
-    if elements:
-        match = _MEDIA_SLUG_RE.search(elements[0].text)
-        if match:
-            return match.group(1)
-    
-    raise NoDownloadsFound(talk_url)
-
-def _get_file_base_name(document):
-    return _clean_up_file_name(
-        document.find('/head/title').text.split('|')[0].strip(),
-        replace_first_colon_with_dash=True
-    )
-
-def _guess_year(name, regexp, talk_url, document):
-    elements = _YEARS_SELECTOR(document)
-    if elements:
-        match = regexp.search(elements[0].text_content())
-        if match:
-            return _clean_up_file_name(match.group(1))
-    
-    logging.warning("Failed to guess the %s of '%s'", name, talk_url)
-    return 'Unknown'
-
-def get_talk_info(talk_url):
-    document = html.parse(talk_url)
-    
-    # Downloads not hosted by TED!
-    if _EXTERNALLY_HOSTED_DOWNLOADS_SELECTOR(document):
-        raise ExternallyHostedDownloads(talk_url)
-    
-    talk_info = {
-        'author': _guess_author(talk_url, document),
-        'event': _guess_event(talk_url, document),
-        'language_codes': _get_subtitle_languages_codes(talk_url, document),
-        'media_slug': _get_media_slug(talk_url, document),
-        'file_base_name': _get_file_base_name(document),
-    }
-    talk_info.update(
-        (name, _guess_year(name, regexp, talk_url, document))
-        for name, regexp in _YEARS_RE_DICT.items()
-    )
     return talk_info
