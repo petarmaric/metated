@@ -87,8 +87,7 @@ def get_talk_info(talk_url):
         if talk_info[k] == 'Unknown':
             logging.warning("Failed to guess the %s of '%s'", k, talk_url)
     
-    if not talk_info['native_downloads']:
-        
+    if talk_info['native_downloads'] in (None, 'Unknown'):
         raise NoDownloadsFound(talk_url)
     
     if not talk_info['subtitled_downloads']:
