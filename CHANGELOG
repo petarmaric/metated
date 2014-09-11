@@ -1,3 +1,17 @@
+metaTED 2.1.2 (September 11, 2014)
+==================================
+
+Bugfixes
+--------
+
+    * Decreased the number of get_downloadable_talks worker processes to avoid
+      TED related timeouts.
+
+    * Improved detection code for talk URLs with no downloads.
+    
+    * Updated supported subtitle language markers as TED updated their HTML
+      layout.
+
 metaTED 2.1.1 (March 24, 2014)
 =============================
 
