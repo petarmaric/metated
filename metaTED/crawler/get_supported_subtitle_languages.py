@@ -5,7 +5,7 @@ import re
 
 
 LANGUAGES_LIST_URL = 'http://www.ted.com/participate/translate/our-languages'
-_LANGUAGES_SELECTOR = CSSSelector('http://www.ted.com/participate/translate/our-languages')
+_LANGUAGES_SELECTOR = CSSSelector('div.languages div div div a')
 _LANGUAGE_CODE_RE = re.compile('/talks/browse\?language=([\w\-]+)')
 
 
