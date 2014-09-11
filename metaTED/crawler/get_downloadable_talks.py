@@ -26,7 +26,7 @@ def get_downloadable_talks(num_workers=None):
         logging.info("Found %d new talk url(s)", num_new_talks)
         
         if num_workers is None:
-            num_workers = 2*cpu_count() # Network IO is the bottleneck
+            num_workers = cpu_count() # Network IO is the bottleneck
         with futures.ProcessPoolExecutor(max_workers=num_workers) as executor:
             future_to_url = dict(
                 (executor.submit(get_talk_info, talk_url), talk_url)
