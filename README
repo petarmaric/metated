@@ -64,14 +64,16 @@ and report bugs.
 .. _pip: http://pip.openplans.org/
 .. _hosted on bitbucket: http://bitbucket.org/petar/metated/
 
-New in metaTED 2.1.1
+New in metaTED 2.1.2
 ====================
 
 Bugfixes
 --------
 
-    * Completely reworked `talk_info` metadata detection code as TED made major
-      changes to their HTML layout.
+    * Decreased the number of get_downloadable_talks worker processes to avoid
+      TED related timeouts.
 
+    * Improved detection code for talk URLs with no downloads.
+    
     * Updated supported subtitle language markers as TED updated their HTML
       layout.

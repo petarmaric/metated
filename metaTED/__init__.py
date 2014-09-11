@@ -1,6 +1,6 @@
 SITE_URL = 'http://www.ted.com/'
 
-__version__ = '2.1.1'
+__version__ = '2.1.2'
 
 
 def main():
