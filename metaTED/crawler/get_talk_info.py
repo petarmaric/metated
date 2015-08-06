@@ -10,7 +10,7 @@ import time
 _HTML_ENTITY_RE = re.compile(r'&(#?[xX]?[0-9a-fA-F]+|\w{1,8});')
 _INVALID_FILE_NAME_CHARS_RE = re.compile('[^\w\.\- ]+')
 
-_VIDEO_PLAYER_DATA_SELECTOR = CSSSelector('div#talk + script')
+_VIDEO_PLAYER_DATA_SELECTOR = CSSSelector('div#master-gpt + script')
 _VIDEO_PLAYER_DATA_JSON_RE = re.compile('q\("talkPage.init",(.+)\)')
 _VIDEO_PLAYER_DATA_TO_TALK_INFO = {
     'speaker': 'author',
