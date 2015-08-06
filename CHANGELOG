@@ -1,3 +1,15 @@
+metaTED 2.1.4 (August 6, 2015)
+==============================
+
+Bugfixes
+--------
+
+    * Updated `talk_info` metadata detection code as TED updated their HTML
+      layout.
+
+    * Updated code for finding talk urls as TED made major changes to their HTML
+      layout.
+
 metaTED 2.1.3 (March 11, 2015)
 ==============================
 
