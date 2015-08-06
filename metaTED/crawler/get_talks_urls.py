@@ -3,19 +3,16 @@ import logging
 from multiprocessing import cpu_count
 from lxml import html
 from lxml.cssselect import CSSSelector
-from math import ceil
-import re
 from urlparse import urljoin
 from .. import SITE_URL
 from ..cache import cached_storage
 
 
-TALKS_LIST_URL_FMT = "http://www.ted.com/talks/quick-list?sort=date&order=asc&page=%d"
+TALKS_LIST_URL_FMT = "http://www.ted.com/talks/quick-list?page=%d"
 
-_PAGINATION_INFO_SELECTOR = CSSSelector('div#wrapper-inner div:nth-child(2) h2')
-_PAGINATION_INFO_RE = re.compile("Showing 1 - (\d+) of \s*(\d+)")
+_PAGINATION_INFO_SELECTOR = CSSSelector('div.pagination a:nth-last-of-type(1)')
 
-_TALKS_URLS_SELECTOR = CSSSelector('table.downloads tr td:nth-child(3) a')
+_TALKS_URLS_SELECTOR = CSSSelector('div.quick-list__row div.title span a')
 
 
 TALKS_URLS_BLACKLIST = [
@@ -32,15 +29,7 @@ def _parse_page(page_num):
 def _get_num_pages():
     logging.debug('Trying to find out the number of talk list pages...')
     elements = _PAGINATION_INFO_SELECTOR(_parse_page(1))
-    match = _PAGINATION_INFO_RE.search(elements[0].text_content())
-    
-    num_talks_urls_per_page, num_talks_urls = [int(g) for g in match.groups()]
-    logging.debug(
-        "Found %d talk url(s), %d per talk list page",
-        num_talks_urls, num_talks_urls_per_page
-    )
-    
-    num_pages = int(ceil(1.0 * num_talks_urls / num_talks_urls_per_page))
+    num_pages = int(elements[0].text_content())
     logging.info("Found %d talk list page(s)", num_pages)
     return num_pages
 
