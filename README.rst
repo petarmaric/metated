@@ -1,3 +1,9 @@
+IMPORTANT NOTICE
+================
+
+This project has been retired. Please contact its author if you wish to take
+over its maintenance.
+
 About
 =====
 
