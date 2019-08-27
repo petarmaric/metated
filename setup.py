@@ -1,16 +1,6 @@
-from distribute_setup import use_setuptools
-use_setuptools()
-
-import sys
 from setuptools import setup, find_packages
 
-
 import metaTED
-
-
-if sys.version_info < (2, 6):
-    print 'ERROR: metaTED requires at least Python 2.6 to run.'
-    sys.exit(1)
 
 
 setup(
@@ -22,7 +12,7 @@ setup(
     author='Petar Maric',
     author_email='petar.maric@gmail.com',
     description='Creates metalink files of TED talks for easier downloading',
-    long_description=open('README').read(),
+    long_description=open('README.rst').read(),
     zip_safe=False,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
