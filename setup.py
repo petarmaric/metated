@@ -1,5 +1,5 @@
 from distribute_setup import use_setuptools
-use_setuptools() 
+use_setuptools()
 
 import sys
 from setuptools import setup, find_packages
@@ -16,7 +16,7 @@ if sys.version_info < (2, 6):
 setup(
     name='metaTED',
     version=metaTED.__version__,
-    url='http://bitbucket.org/petar/metated/',
+    url='https://gitlab.com/petar.maric/metated',
     download_url='http://pypi.python.org/pypi/metaTED',
     license='BSD',
     author='Petar Maric',

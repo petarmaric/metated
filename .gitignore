@@ -1,0 +1,8 @@
+*.pyc
+dist/
+build/
+metaTED.egg-info/
+*.kpf
+.project
+.pydevproject
+.settings/

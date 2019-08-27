@@ -61,8 +61,8 @@ You can install metaTED with `pip`_ via ``pip install metaTED``. You can run it
 with ``metaTED``, or ``metaTED -h`` to get help and the list of all available
 options.
 
-The project itself is `hosted on bitbucket`_, from where you can get the code
+The project itself is `hosted on GitLab`_, from where you can get the code
 and report bugs.
 
 .. _pip: http://pip.openplans.org/
-.. _hosted on bitbucket: http://bitbucket.org/petar/metated/
+.. _hosted on GitLab: https://gitlab.com/petar.maric/metated
