@@ -6,7 +6,7 @@ import metaTED
 setup(
     name='metaTED',
     version=metaTED.__version__,
-    url='https://gitlab.com/petar.maric/metated',
+    url='https://github.com/petarmaric/metated',
     download_url='http://pypi.python.org/pypi/metaTED',
     license='BSD',
     author='Petar Maric',
