@@ -1,6 +1,6 @@
 SITE_URL = 'http://www.ted.com/'
 
-__version__ = '2.1.4'
+__version__ = '2.1.5'
 
 
 def main():
@@ -31,11 +31,11 @@ def main():
         help='Write generated metalinks to specified output directory'
     )
     (options, _) = parser.parse_args()
-    
+
     # Configure logging
     log_level = options.verbosity or logging.INFO
     logging.basicConfig(level=log_level, format="[%(levelname)s] %(message)s")
-    
+
     # Generate metalinks
     from metaTED.metalink import generate_metalinks
     generate_metalinks(options.output_dir)

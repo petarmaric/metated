@@ -1,3 +1,16 @@
+metaTED 2.1.5 (August 27, 2019)
+===============================
+
+Bugfixes
+--------
+
+    * Reformatted README.rst.
+
+    * Migrated from Bitbucket (Mercurial) to GitLab (Git).
+
+    * Removed distribute_setup.py as 'Distribute' is a now deprecated fork of
+      the 'Setuptools' project
+
 metaTED 2.1.4 (August 6, 2015)
 ==============================
 
@@ -29,7 +42,7 @@ Bugfixes
       TED related timeouts.
 
     * Improved detection code for talk URLs with no downloads.
-    
+
     * Updated supported subtitle language markers as TED updated their HTML
       layout.
 
