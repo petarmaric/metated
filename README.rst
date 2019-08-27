@@ -1,37 +1,40 @@
+About
+=====
+
 metaTED is a tool that makes it easy to download all of the `TED talks`_. It
 does so by creating over 1,000 `metalinks`_ of TED talks varying in both the
 quality levels and possible talk groupings by directory. Features include:
 
-    * Creates talks with informative file names - i.e.
-      ``Unconventional Explanations/Hans Rosling on HIV - New facts and stunning data visuals.mp4``
-      instead of original ``HansRosling_2009_480.mp4``.
+* Creates talks with informative file names - i.e.
+  ``Unconventional Explanations/Hans Rosling on HIV - New facts and stunning data visuals.mp4``
+  instead of original ``HansRosling_2009_480.mp4``.
 
-    * Provides subtitles for talks in over 85 supported languages. New
-      languages and translations are added daily through the
-      `TED Open Translation Project`_, and you help out by
-      `becoming a translator today`_.
+* Provides subtitles for talks in over 85 supported languages. New
+  languages and translations are added daily through the
+  `TED Open Translation Project`_, and you help out by
+  `becoming a translator today`_.
 
-    * Tries hard to get all of the talks, or at least most of them - with a good
-      reason if some have failed.
+* Tries hard to get all of the talks, or at least most of them - with a good
+  reason if some have failed.
 
-    * More choice - creates one metalink per available quality level
-      (currently low, standard and high).
+* More choice - creates one metalink per available quality level
+  (currently low, standard and high).
 
-    * More choice - creates one metalink per available talk grouping, with all
-      talks belonging to the same group placed inside a common directory. The
-      possible talk groupings are extracted from talks metadata (currently
-      filming year, publishing year, event name and author).
+* More choice - creates one metalink per available talk grouping, with all
+  talks belonging to the same group placed inside a common directory. The
+  possible talk groupings are extracted from talks metadata (currently
+  filming year, publishing year, event name and author).
 
-    * Aggressive caching throughout the project, to avoid expensive network/CPU
-      operations as much as possible. Proper cache invalidation included.
+* Aggressive caching throughout the project, to avoid expensive network/CPU
+  operations as much as possible. Proper cache invalidation included.
 
-    * High levels of fault tolerance. 
+* High levels of fault tolerance.
 
-    * Simple, yet powerful homegrown web crawler. 
+* Simple, yet powerful homegrown web crawler.
 
-    * Flexible and extensible software design with changes in mind.
+* Flexible and extensible software design with changes in mind.
 
-    * Provides both the console script and a public API.
+* Provides both the console script and a public API.
 
 .. _becoming a translator today: http://www.ted.com/translate/forted
 .. _metalinks: http://en.wikipedia.org/wiki/Metalink
@@ -63,15 +66,3 @@ and report bugs.
 
 .. _pip: http://pip.openplans.org/
 .. _hosted on bitbucket: http://bitbucket.org/petar/metated/
-
-New in metaTED 2.1.4
-====================
-
-Bugfixes
---------
-
-    * Updated `talk_info` metadata detection code as TED updated their HTML
-      layout.
-
-    * Updated code for finding talk urls as TED made major changes to their HTML
-      layout.
