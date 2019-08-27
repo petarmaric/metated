@@ -6,3 +6,4 @@ metaTED.egg-info/
 .project
 .pydevproject
 .settings/
+.vscode/
